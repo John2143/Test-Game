@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+static unsigned long clockDivisor;
+
 #ifdef WIN32
 #	include <Windows.h>
 #	define thread DWORD
@@ -7,15 +10,14 @@
 #	define threadRType DWORD WINAPI
 #	define threadExit() return 0;
 #	define clockType LARGE_INTEGER
-static LARGE_INTEGER clockDivisor;
 #else
 #	include <pthread.h>
+#	include <time.h>
 #	define thread pthread
 #	define newThread(f, arg, id) pthread_create(id, NULL, f, arg)
 #	define threadRType void*
 #	define threadExit() pthread_exit(NULL);
 #	define clockType int
-static LARGE_INTEGER clockDivisor = CLOCKS_PER_SEC;
 #endif
 
 #include <SDL2/SDL.h>
@@ -23,15 +25,20 @@ static LARGE_INTEGER clockDivisor = CLOCKS_PER_SEC;
 #include "input.h"
 #include "graphics.h"
 #include "logic.h"
+#include "global.h"
 
-/*const float g_sin45 = 0.70710678118f;*/
-
-typedef float framerate;
-
-threadRType test(void *args){
-	(void) args;
-	printf("WOW\n");
-	threadExit();
+/*threadRType test(void *args){*/
+	/*(void) args;*/
+	/*printf("WOW\n");*/
+	/*threadExit);*/
+/*}*/
+static char isVSync = 0;
+static void toggleVSync(uint32_t code, char pressed){
+	(void) code;
+	if(pressed){
+		setVSync(isVSync = !isVSync);
+		printf("\rVSync: %i\n", isVSync);
+	}
 }
 
 static void getClockTime(clockType *val){
@@ -42,11 +49,12 @@ static void getClockTime(clockType *val){
 #endif
 }
 
-static double getDiffClock(clockType a, clockType b){
+static framerate getDiffClock(clockType a, clockType b){
 #ifdef WIN32
-	return (double) ((b.QuadPart - a.QuadPart) / clockDivisor.QuadPart);
+	long diff = b.QuadPart - a.QuadPart;
+	return diff / (double) clockDivisor;
 #else
-	return (double) (b - a) / clockDivisortoms;
+	return (b - a) / (double) clockDivisor;
 #endif
 }
 
@@ -54,10 +62,17 @@ int main(int argc, char** argv) {
 	(void) argc;
 	(void) argv;
 #ifdef WIN32
-	QueryPerformanceFrequency(&clockDivisor);
+	{
+		LARGE_INTEGER divisor;
+		QueryPerformanceFrequency(&divisor);
+		clockDivisor = divisor.QuadPart;
+	}
+#else
+	clockDivisor = CLOCKS_PER_SEC;
 #endif
+	onKeyPress = toggleVSync;
 
-	printf("Starting\n");
+	printf("Starting\nClock divisor: %lu\n", clockDivisor);
 	struct graphics g;
 	SDL_Event event;
 
@@ -66,13 +81,15 @@ int main(int argc, char** argv) {
 
 	initiateGraphics(&g, "Test window");
 	if(!g.window) goto CLEANUP;
-	thread t;
-	newThread(test, NULL, &t);
+	/*thread t;*/
+	/*newThread(test, NULL, &t);*/
 
 	clockType frameStart, frameEnd;
 	framerate frameTime = 0;
+	short frames = 0;
 
 	getClockTime(&frameStart);
+	initLogic();
 	while(1){
 		if(SDL_PollEvent(&event)){
 			switch(event.type){
@@ -86,17 +103,16 @@ int main(int argc, char** argv) {
 		}
 		renderGraphics(&g);
 
-		/*clock_gettime(CLOCK_MONOTONIC_RAW, &frameEnd);*/
+		getClockTime(&frameEnd);
 
-		/*if(framems < MAXFRAMETIE)*/
-			/*framems = MAXFRAMETIME;*/
-
-		getClockTime(&frameStart);
-		
 		frameTime = getDiffClock(frameStart, frameEnd);
-		gameUpdate(frameTime);
-
+		framerate fps = 1 / frameTime;
+		++frames;
+		if(!(frames %= 1000))
+			printf("fps: %3.2f		%f\r", fps, pos);
 		frameStart = frameEnd;
+
+		gameUpdate(frameTime);
 	}
 CLEANUP:
 	destroyGraphics(&g);

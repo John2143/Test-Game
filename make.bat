@@ -1,3 +1,4 @@
+@echo off
 gcc -Wall -Wextra ^
 	-g -DDEBUG ^
 	-L. -Iinclude ^

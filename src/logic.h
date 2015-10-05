@@ -1,6 +1,11 @@
 #ifndef logic_H
 #define logic_H
 
-void gameUpdate(float framems);
+#include "global.h"
+#include "math.h"
+
+void gameUpdate(framerate framems);
+void initLogic();
+double pos;
 
 #endif

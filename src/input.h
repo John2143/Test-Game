@@ -12,6 +12,6 @@
 void keyEvent(SDL_KeyboardEvent key);
 int isKeyPressed(uint32_t code);
 
-void (*onKeyPress)(uint32_t code, int pressed);
+void (*onKeyPress)(uint32_t code, char pressed);
 
 #endif

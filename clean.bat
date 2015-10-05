@@ -1,2 +1,3 @@
-del game.exe
-del a.exe
+@echo off
+del game.exe /Q
+del a.exe /Q

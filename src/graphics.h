@@ -5,6 +5,8 @@
 #include <GL/GLU.h>
 #include <stdio.h>
 
+#include "logic.h"
+
 struct graphics{
 	SDL_Window *window;
 	SDL_GLContext *glcontext;
@@ -13,5 +15,6 @@ struct graphics{
 void initiateGraphics(struct graphics *g, const char* name);
 void destroyGraphics(struct graphics *g);
 void renderGraphics(struct graphics *g);
+void setVSync(char vsync);
 
 #endif
