@@ -3,6 +3,7 @@ gcc -Wall -Wextra ^
 	-g -DDEBUG ^
 	-L. -Iinclude ^
 	src/game.c ^
+	src/font.c ^
 	src/graphics.c ^
 	src/input.c ^
 	src/logic.c ^

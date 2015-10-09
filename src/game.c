@@ -58,6 +58,8 @@ static framerate getDiffClock(clockType a, clockType b){
 #endif
 }
 
+framerate fps;
+
 int main(int argc, char** argv) {
 	(void) argc;
 	(void) argv;
@@ -76,9 +78,6 @@ int main(int argc, char** argv) {
 	struct graphics g;
 	SDL_Event event;
 
-	const framerate FPS = 144;
-	(void) FPS;
-
 	initiateGraphics(&g, "Test window");
 	if(!g.window) goto CLEANUP;
 	/*thread t;*/
@@ -86,7 +85,6 @@ int main(int argc, char** argv) {
 
 	clockType frameStart, frameEnd;
 	framerate frameTime = 0;
-	short frames = 0;
 
 	getClockTime(&frameStart);
 	initLogic();
@@ -106,10 +104,7 @@ int main(int argc, char** argv) {
 		getClockTime(&frameEnd);
 
 		frameTime = getDiffClock(frameStart, frameEnd);
-		framerate fps = 1 / frameTime;
-		++frames;
-		if(!(frames %= 1000))
-			printf("fps: %3.2f		%f\r", fps, pos);
+		fps = 1 / frameTime;
 		frameStart = frameEnd;
 
 		gameUpdate(frameTime);
