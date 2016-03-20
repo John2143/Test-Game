@@ -7,7 +7,7 @@
 #	include <stdio.h>
 #endif
 
-#define MAXKEYSDOWN 8
+#define MAXKEYSDOWN 16
 
 void keyEvent(SDL_KeyboardEvent key);
 int isKeyPressed(uint32_t code);

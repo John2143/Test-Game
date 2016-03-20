@@ -27,11 +27,6 @@ static unsigned long clockDivisor;
 #include "logic.h"
 #include "global.h"
 
-/*threadRType test(void *args){*/
-	/*(void) args;*/
-	/*printf("WOW\n");*/
-	/*threadExit);*/
-/*}*/
 static char isVSync = 0;
 static void toggleVSync(uint32_t code, char pressed){
 	(void) code;
@@ -72,7 +67,7 @@ int main(int argc, char** argv) {
 #else
 	clockDivisor = CLOCKS_PER_SEC;
 #endif
-	onKeyPress = toggleVSync;
+	onKeyPress = toggleVSync; //TODO
 
 	printf("Starting\nClock divisor: %lu\n", clockDivisor);
 	struct graphics g;

@@ -8,15 +8,28 @@ static void logWindowDetails(const char * detail, SDL_DisplayMode *mode){
 	);
 }
 
-static struct font *debugFont;
+static GLuint texture;
+static GLint LODlevel = 0;
 
 void initiateGraphics(struct graphics *g, const char* name){
-	SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
+	if(SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0){
+        printf("SDL failed to start: %s", SDL_GetError());
+        return;
+    }
 	g->window = SDL_CreateWindow(
 		name,
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 480,
 		SDL_WINDOW_OPENGL
 	);
+
+    if(!g->window){
+        printf("Failed to create error: %s\n", SDL_GetError());
+        return;
+    }
+    if(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)){
+        printf("Failed to load SDL_image: %s\n", IMG_GetError());
+        return;
+    }
 
 	SDL_DisplayMode mode;
 	SDL_GetWindowDisplayMode(g->window, &mode);
@@ -25,45 +38,55 @@ void initiateGraphics(struct graphics *g, const char* name){
 	g->glcontext = SDL_GL_CreateContext(g->window);
 	g->height = mode.h;
 	g->width = mode.w;
-	glClearColor(1, 0, 0, 1);
+	glClearColor(0, 0, 0, 1);
 	setVSync(0);
-	glEnable(GL_TEXTURE_2D);
-	debugFont = loadFont(""); //TODO
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    texture = loadTexture("assets/meme.png");
+}
+
+GLuint loadTexture(const char *name){
+    SDL_Surface *texture = IMG_Load(name);
+
+    GLuint id = 0;
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+
+    int mode = texture->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+    glTexImage2D(GL_TEXTURE_2D, LODlevel, mode, texture->w, texture->h, 0, mode, GL_UNSIGNED_BYTE, texture->pixels);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    printf("Loaded %s: %s", name, mode == GL_RGBA ? "RGBA" : "RGB");
+    SDL_FreeSurface(texture);
+    return id;
 }
 
 void destroyGraphics(struct graphics *g){
+    IMG_Quit();
+
 	SDL_GL_DeleteContext(g->glcontext);
 	SDL_DestroyWindow(g->window);
 	SDL_Quit();
 }
 
-void renderWorld(){
-	double spos, cpos;
-	spos = sin(pos) * .5f;
-	cpos = cos(pos) * .5f;
-
-	glColor3f(0, spos + .5f, cpos + .5f);
-	glBegin(GL_QUADS);
-		glVertex2f(-spos, -cpos);
-		glVertex2f(spos, -cpos);
-		glVertex2f(spos, cpos);
-		glVertex2f(-spos, cpos);
-	glEnd();
-
-	glColor3f(cpos + .5f, cpos + .5f, cpos + .5f);
-	glBegin(GL_QUADS);
-		glVertex2f(0.5f, 0.5f);
-		glVertex2f(1.0f, 0.5f);
-		glVertex2f(1.0f, 1.0f);
-		glVertex2f(0.5f, 1.0f);
-	glEnd();
+static void renderWorld(){
 }
-void renderInterface(){
-	renderText("Abcde", debugFont, 20, 20, 5);
-	char fText[8];
-	snprintf(fText, 7, "%.1f", fps);
-	fText[8] = '\0';
-	renderText(fText, debugFont, 0, 0, 2);
+
+static void renderWorld2D(){
+}
+
+static void renderInterface(){
+    glBindTexture(GL_TEXTURE_2D, texture);
+    int x = 200, y = 10, height = 32, width = 32;
+	glBegin(GL_QUADS);
+		glTexCoord2i(0, 0); glVertex3i(x, y, 0);
+		glTexCoord2i(1, 0); glVertex3i(x + width, y, 0);
+		glTexCoord2i(1, 1); glVertex3i(x + width, y + height, 0);
+		glTexCoord2i(0, 1); glVertex3i(x, y + height, 0);
+	glEnd();
 }
 
 void renderGraphics(struct graphics *g){
@@ -74,16 +97,22 @@ void renderGraphics(struct graphics *g){
 	glPushMatrix();
 		glOrtho(0., g->width, g->height, 0., 0., 1.);
 		glColor3f(1.0f, 1.0f, 1.0f);
+        renderWorld2D();
 		renderInterface();
 	glPopMatrix();
 
 	SDL_GL_SwapWindow(g->window);
 }
 
-int renderText(const char *text, struct font *f, int x, int y, int scale){
-	int i = 0;
-	for(;text[i] != '\0'; i++){
-		x += renderChar(f, text[i], x, y, scale);
+int renderChar(char text, int x, int y, int scale){
+    (void) text;
+    (void) (x + y + scale);
+    return 1;
+}
+
+int renderText(const char *text, int x, int y, int scale){
+	for(int i = 0; text[i] != '\0'; i++){
+		x += renderChar(text[i], x, y, scale);
 	}
 	return x; // x - xinitial?
 }

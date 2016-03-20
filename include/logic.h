@@ -6,6 +6,5 @@
 
 void gameUpdate(framerate framems);
 void initLogic();
-double pos;
 
 #endif
