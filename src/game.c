@@ -79,9 +79,15 @@ int main(int argc, char** argv) {
 
 	clockType frameStart, frameEnd;
 	framerate frameTime = 0;
-
 	getClockTime(&frameStart);
+
 	initLogic();
+    loadEntities();
+
+    pent e = newEntity(0);
+    spawnEntity(e);
+    setControlledEntity(e);
+
 	while(1){
 		if(SDL_PollEvent(&event)){
 			switch(event.type){
@@ -94,18 +100,22 @@ int main(int argc, char** argv) {
 				break;
 			}
 		}
+
 		renderGraphics(&g);
 
 		getClockTime(&frameEnd);
-
 		frameTime = getDiffClock(frameStart, frameEnd);
 		fps = 1 / frameTime;
 		frameStart = frameEnd;
-
 		gameUpdate(frameTime);
 	}
 CLEANUP:
+
+    unspawnEntity(e);
+    deleteEntity(e);
+
 	destroyGraphics(&g);
+    unloadEntities();
 
 	return 0;
 }

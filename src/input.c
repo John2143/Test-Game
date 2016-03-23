@@ -1,10 +1,9 @@
 #include "input.h"
 
-static uint32_t keysdown[MAXKEYSDOWN];
+uint32_t keysdown[MAXKEYSDOWN];
 
 static short replaceFirst(uint32_t a, uint32_t b){
-	short i;
-	for(i = 0; i < MAXKEYSDOWN; i++){
+	for(short i = 0; i < MAXKEYSDOWN; i++){
 		if(keysdown[i] == a){
 			keysdown[i] = b;
 			return i;
@@ -15,8 +14,7 @@ static short replaceFirst(uint32_t a, uint32_t b){
 
 #ifdef DEBUG
 static void printAll(){
-	int i;
-	for(i = 0; i < MAXKEYSDOWN; i++){
+	for(int i = 0; i < MAXKEYSDOWN; i++){
 		if(keysdown[i]){
 			printf("%.3x", keysdown[i]);
 		}else{
@@ -33,9 +31,9 @@ void keyEvent(SDL_KeyboardEvent key){
 	int state = key.state == SDL_PRESSED;
 
 	if(state){
-		(void) replaceFirst(0, code);
+		replaceFirst(0, code);
 	}else{
-		(void) replaceFirst(code, 0);
+		replaceFirst(code, 0);
 	}
 #ifdef DEBUG
 	printAll();
@@ -43,8 +41,7 @@ void keyEvent(SDL_KeyboardEvent key){
 }
 
 int isKeyPressed(uint32_t code){
-	int i;
-	for(i = 0; i < MAXKEYSDOWN; i++){
+	for(int i = 0; i < MAXKEYSDOWN; i++){
 		if(keysdown[i] == code){
 			return code;
 		}

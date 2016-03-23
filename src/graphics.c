@@ -76,6 +76,18 @@ static void renderWorld(){
 }
 
 static void renderWorld2D(){
+    pent c = worldEntities.first;
+    while(c != NULL){
+        glBindTexture(GL_TEXTURE_2D, c->textureID);
+        int x = (int) c->x, y = (int) c->y, height = 32, width = 32;
+        glBegin(GL_QUADS);
+            glTexCoord2i(0, 0); glVertex3i(x, y, 0);
+            glTexCoord2i(1, 0); glVertex3i(x + width, y, 0);
+            glTexCoord2i(1, 1); glVertex3i(x + width, y + height, 0);
+            glTexCoord2i(0, 1); glVertex3i(x, y + height, 0);
+        glEnd();
+        c = c->next;
+    }
 }
 
 static void renderInterface(){

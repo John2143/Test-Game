@@ -12,4 +12,6 @@
 void keyEvent(SDL_KeyboardEvent key);
 int isKeyPressed(uint32_t code);
 
+extern uint32_t keysdown[MAXKEYSDOWN];
+
 #endif

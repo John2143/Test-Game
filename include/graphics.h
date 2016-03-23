@@ -6,7 +6,7 @@
 #include <GL/GLU.h>
 #include <stdio.h>
 
-#include "logic.h"
+#include "entity.h" //knowing how to draw entities
 
 struct graphics{
 	SDL_Window *window;
