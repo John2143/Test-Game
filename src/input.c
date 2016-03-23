@@ -18,7 +18,7 @@ static void printAll(){
 	int i;
 	for(i = 0; i < MAXKEYSDOWN; i++){
 		if(keysdown[i]){
-			printf("%.3u", keysdown[i]);
+			printf("%.3x", keysdown[i]);
 		}else{
 			printf("...");
 		}
@@ -40,8 +40,6 @@ void keyEvent(SDL_KeyboardEvent key){
 #ifdef DEBUG
 	printAll();
 #endif
-	if(onKeyPress)
-		onKeyPress(code, state);
 }
 
 int isKeyPressed(uint32_t code){

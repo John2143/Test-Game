@@ -26,15 +26,16 @@ static unsigned long clockDivisor;
 #include "graphics.h"
 #include "logic.h"
 #include "global.h"
+#include "entity.h"
 
-static char isVSync = 0;
-static void toggleVSync(uint32_t code, char pressed){
-	(void) code;
-	if(pressed){
-		setVSync(isVSync = !isVSync);
-		printf("\rVSync: %i\n", isVSync);
-	}
-}
+/*static char isVSync = 0;*/
+/*static void toggleVSync(uint32_t code, char pressed){*/
+	/*(void) code;*/
+	/*if(pressed){*/
+		/*setVSync(isVSync = !isVSync);*/
+		/*printf("\rVSync: %i\n", isVSync);*/
+	/*}*/
+/*}*/
 
 static void getClockTime(clockType *val){
 #ifdef WIN32
@@ -67,8 +68,6 @@ int main(int argc, char** argv) {
 #else
 	clockDivisor = CLOCKS_PER_SEC;
 #endif
-	onKeyPress = toggleVSync; //TODO
-
 	printf("Starting\nClock divisor: %lu\n", clockDivisor);
 	struct graphics g;
 	SDL_Event event;
@@ -90,6 +89,7 @@ int main(int argc, char** argv) {
 				goto CLEANUP;
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
+                if(event.key.keysym.scancode == 0x14) goto CLEANUP; //TODO
 				keyEvent(event.key);
 				break;
 			}
