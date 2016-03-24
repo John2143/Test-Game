@@ -57,7 +57,7 @@ GLuint loadTexture(const char *name){
     int mode = texture->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
     glTexImage2D(GL_TEXTURE_2D, LODlevel, mode, texture->w, texture->h, 0, mode, GL_UNSIGNED_BYTE, texture->pixels);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     printf("Loaded %s: %s", name, mode == GL_RGBA ? "RGBA" : "RGB");
     SDL_FreeSurface(texture);
@@ -79,12 +79,12 @@ static void renderWorld2D(){
     pent c = worldEntities.first;
     while(c != NULL){
         glBindTexture(GL_TEXTURE_2D, c->textureID);
-        int x = (int) c->x, y = (int) c->y, height = 32, width = 32;
+        int x = (int) c->x, y = (int) c->y;
         glBegin(GL_QUADS);
             glTexCoord2i(0, 0); glVertex3i(x, y, 0);
-            glTexCoord2i(1, 0); glVertex3i(x + width, y, 0);
-            glTexCoord2i(1, 1); glVertex3i(x + width, y + height, 0);
-            glTexCoord2i(0, 1); glVertex3i(x, y + height, 0);
+            glTexCoord2i(1, 0); glVertex3i(x + c->w, y, 0);
+            glTexCoord2i(1, 1); glVertex3i(x + c->w, y + c->h, 0);
+            glTexCoord2i(0, 1); glVertex3i(x, y + c->h, 0);
         glEnd();
         c = c->next;
     }

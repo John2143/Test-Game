@@ -75,9 +75,21 @@ int main(int argc, char** argv) {
 	initLogic();
     loadEntities();
 
-    pent e = newEntity(0);
-    spawnEntity(e);
-    setControlledEntity(e);
+    pent player = newEntity(0);
+    spawnEntity(player);
+    setControlledEntity(player);
+
+    for(int i = 0; i < 100; i++){
+        pent e = newEntity(1);
+        e->ai = AI_WANDER;
+        spawnEntity(e);
+    }
+
+    for(int i = 0; i < 1; i++){
+        pent e = newEntity(1);
+        e->ai = AI_CHASE;
+        spawnEntity(e);
+    }
 
 	while(1){
 		if(SDL_PollEvent(&event)){
@@ -102,8 +114,8 @@ int main(int argc, char** argv) {
 	}
 CLEANUP:
 
-    unspawnEntity(e);
-    deleteEntity(e);
+    unspawnEntity(player);
+    deleteEntity(player);
 
 	destroyGraphics(&g);
     unloadEntities();

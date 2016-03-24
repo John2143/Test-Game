@@ -12,22 +12,36 @@ struct stats{
     int def, agi, hp;
 };
 
+enum AI{
+    AI_NONE,
+    AI_WANDER,
+    AI_CHASE,
+};
+
 struct entityData{
     GLuint textureID;
     struct stats stats; //Default stats of a entity
     const char *name;
+    int scale;
 };
+
 
 typedef struct entity{
     int globalid;
+    int parentid;
 
     GLuint textureID;
     //size_t textureOffset;
 
+    int scale;
     double x, y;
+    int w, h;
     double facing;
     int hp;
     struct stats stats; //Customs stats: modified at spawn time
+
+    enum AI ai;
+    char *name;
 
     struct entity *next;
 } *pent;
@@ -43,12 +57,19 @@ extern struct worldLinkedList worldEntities;
 void spawnEntity(pent e);
 void unspawnEntity(pent e);
 
-pent newEntity();
+pent newEntity(int parentid);
 void deleteEntity(pent e);
 void moveEntity(pent e, double x, double y);
 void setEntityPos(pent e, double x, double y);
 void moveEntityAng(pent e, double ang, double del);
 void killEntity(pent e);
+
+int getEntityMovespeed(pent e);
+void setEntitySize(pent e, int scale);
+void embiggenEntity(pent e);
+const char *getName(pent e);
+
+pent findClosestEntity(pent to, int type);
 
 void loadEntities();
 void unloadEntities();

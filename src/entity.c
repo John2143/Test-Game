@@ -27,7 +27,7 @@ void unspawnEntity(pent e){
             if(lastEnt){
                 lastEnt->next = e->next;
             }else{
-                worldEntities.first = NULL;
+                worldEntities.first = e->next;
             }
             return; //entity removed successfully
         }
@@ -40,14 +40,17 @@ void unspawnEntity(pent e){
 pent newEntity(int parentid){
     pent e = malloc(sizeof(*e));
     e->globalid = currentEntityID++;
+    e->parentid = parentid;
 
     e->textureID = defaultEntites[parentid].textureID;
     e->stats = defaultEntites[parentid].stats;
 
-    e->x = 5;
-    e->y = 5;
-    e->hp = 0;
+    setEntityPos(e, 200, 200);
+    setEntitySize(e, 4);
+
+    e->hp = e->stats.hp;
     e->facing = 0;
+
 
 
     /*typedef struct entity{*/
@@ -92,15 +95,48 @@ void killEntity(pent e){
 }
 
 void loadEntities(){
-    defaultEntites = malloc(1 * sizeof(*defaultEntites));
+    defaultEntites = malloc(2 * sizeof(*defaultEntites));
 
-    defaultEntites[0].name = "testname";
+    defaultEntites[0].name = "Player";
     defaultEntites[0].textureID = loadTexture(assetFolderPath "meme.png");
     defaultEntites[0].stats = (struct stats) {
+        .hp = 100, .def = 0, .agi = 50
+    };
+
+    defaultEntites[1].name = "testname";
+    defaultEntites[1].textureID = loadTexture(assetFolderPath "meme.png");
+    defaultEntites[1].stats = (struct stats) {
         .hp = 100, .def = 0, .agi = 0
     };
 }
 
 void unloadEntities(){
     free(defaultEntites);
+}
+
+int getEntityMovespeed(pent e){
+    return e->stats.agi * 2 + 200;
+}
+
+pent findClosestEntity(pent to, int type){
+    pent c = worldEntities.first;
+    while(c != NULL){
+        if(c != to && type == c->parentid) return c;
+        c = c->next;
+    }
+    return NULL;
+}
+
+const char *getName(pent e){
+    return e->name == NULL ? defaultEntites[e->parentid].name : e->name;
+}
+
+void setEntitySize(pent e, int scale){
+    e->w = scale * 8;
+    e->h = scale * 8;
+}
+
+void embiggenEntity(pent e){
+    e->w += 8;
+    e->h += 8;
 }
