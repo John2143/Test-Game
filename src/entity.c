@@ -1,6 +1,6 @@
 #include <entity.h>
 
-static int currentEntityID = 0;
+static unsigned int currentEntityID = 0;
 struct worldLinkedList worldEntities = {
     .first = NULL,
     .last = NULL
@@ -82,8 +82,8 @@ void setEntityPos(pent e, double x, double y){
 }
 
 void moveEntityAng(pent e, double ang, double del){
-    e->x += cos(ang) * del;
-    e->y += sin(ang) * del;
+    e->x += sin(ang) * del;
+    e->y -= cos(ang) * del;
 }
 
 void killEntity(pent e){
@@ -97,7 +97,7 @@ void loadEntities(){
     defaultEntites[0].name = "testname";
     defaultEntites[0].textureID = loadTexture(assetFolderPath "meme.png");
     defaultEntites[0].stats = (struct stats) {
-        .hp = 100, .def = 0, .agi = 10
+        .hp = 100, .def = 0, .agi = 0
     };
 }
 

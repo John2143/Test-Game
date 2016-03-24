@@ -7,4 +7,6 @@
 #define assetFolder "assets"
 #define assetFolderPath assetFolder "/"
 
+typedef enum {false, true} bool;
+
 #endif

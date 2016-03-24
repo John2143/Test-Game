@@ -21,7 +21,7 @@ void initiateGraphics(struct graphics *g, const char* name);
 void destroyGraphics(struct graphics *g);
 void renderGraphics(struct graphics *g);
 int renderText(const char *text, int x, int y, int scale);
-void setVSync(char vsync);
+void setVSync(bool vsync);
 GLuint loadTexture(const char *name);
 
 #endif

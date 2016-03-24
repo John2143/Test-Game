@@ -2,8 +2,8 @@
 
 uint32_t keysdown[MAXKEYSDOWN];
 
-static short replaceFirst(uint32_t a, uint32_t b){
-	for(short i = 0; i < MAXKEYSDOWN; i++){
+static int replaceFirst(uint32_t a, uint32_t b){
+	for(int i = 0; i < MAXKEYSDOWN; i++){
 		if(keysdown[i] == a){
 			keysdown[i] = b;
 			return i;

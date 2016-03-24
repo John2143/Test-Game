@@ -91,14 +91,6 @@ static void renderWorld2D(){
 }
 
 static void renderInterface(){
-    glBindTexture(GL_TEXTURE_2D, texture);
-    int x = 200, y = 10, height = 32, width = 32;
-	glBegin(GL_QUADS);
-		glTexCoord2i(0, 0); glVertex3i(x, y, 0);
-		glTexCoord2i(1, 0); glVertex3i(x + width, y, 0);
-		glTexCoord2i(1, 1); glVertex3i(x + width, y + height, 0);
-		glTexCoord2i(0, 1); glVertex3i(x, y + height, 0);
-	glEnd();
 }
 
 void renderGraphics(struct graphics *g){
@@ -129,6 +121,6 @@ int renderText(const char *text, int x, int y, int scale){
 	return x; // x - xinitial?
 }
 
-void setVSync(char vsync){
+void setVSync(bool vsync){
 	SDL_GL_SetSwapInterval(!!vsync);
 }

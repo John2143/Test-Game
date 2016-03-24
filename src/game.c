@@ -28,15 +28,6 @@ static unsigned long clockDivisor;
 #include "global.h"
 #include "entity.h"
 
-/*static char isVSync = 0;*/
-/*static void toggleVSync(uint32_t code, char pressed){*/
-	/*(void) code;*/
-	/*if(pressed){*/
-		/*setVSync(isVSync = !isVSync);*/
-		/*printf("\rVSync: %i\n", isVSync);*/
-	/*}*/
-/*}*/
-
 static void getClockTime(clockType *val){
 #ifdef WIN32
 	QueryPerformanceCounter(val);
