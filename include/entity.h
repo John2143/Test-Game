@@ -6,7 +6,7 @@
 #include <stdlib.h> //malloc etc
 
 #include "global.h" //asset folder
-#include "graphics.h" //loadTexture
+GLuint loadTexture(const char *name);
 
 struct stats{
     int def, agi, hp;
@@ -46,6 +46,7 @@ typedef struct entity{
     char *name;
 
     struct entity *next;
+    struct entity *last;
 } *pent;
 //I normally don't typdef structs, but I have a feeling struct entity * will be used a lot.
 

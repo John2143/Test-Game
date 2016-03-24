@@ -22,11 +22,11 @@ static unsigned long clockDivisor;
 
 #include <SDL2/SDL.h>
 
+#include "global.h"
+#include "entity.h"
 #include "input.h"
 #include "graphics.h"
 #include "logic.h"
-#include "global.h"
-#include "entity.h"
 #include "lua.h"
 
 static void getClockTime(clockType *val){
@@ -75,6 +75,7 @@ int main(int argc, char** argv) {
     loadEntities();
     luaStart();
 
+
 	while(1){
 		if(SDL_PollEvent(&event)){
 			switch(event.type){
@@ -94,12 +95,13 @@ int main(int argc, char** argv) {
 		frameTime = getDiffClock(frameStart, frameEnd);
 		frameStart = frameEnd;
         gameUpdate(frameTime);
+        cameraTick(frameTime);
 	}
 CLEANUP:
 
-	destroyGraphics(&g);
     luaEnd();
     unloadEntities();
+	destroyGraphics(&g);
 
 	return 0;
 }

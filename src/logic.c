@@ -4,6 +4,7 @@ pent controlledEntity = NULL;
 
 void setControlledEntity(pent e){
     controlledEntity = e;
+    cameraFollowEntity(e);
 }
 
 enum movementDirection{
@@ -25,6 +26,9 @@ static const double movementDirectionAngles[] = {
 #define KP_DOWN  isKeyPressed(0x51)
 #define KP_LEFT  isKeyPressed(0x50)
 #define KP_RIGHT isKeyPressed(0x4F)
+
+#define KP_ROR isKeyPressed(0x1B)
+#define KP_ROL isKeyPressed(0x1D)
 
 static void controlEntity(framerate framems){
     enum movementDirection direction = MOVED_NONE;
@@ -49,12 +53,11 @@ static void controlEntity(framerate framems){
         }
     }
 
-    if(isKeyPressed(0xa)){
-        controlledEntity->stats.agi = 0;
-    }else if(isKeyPressed(0xb)){
-        controlledEntity->stats.agi = 100;
-    }else if(isKeyPressed(0xd)){
-        controlledEntity->stats.agi = 150;
+    if(KP_ROR && !KP_ROL){
+        cameraAng += framems * 20;
+    }
+    if(KP_ROL && !KP_ROR){
+        cameraAng += framems * 20;
     }
 
     if(direction != MOVED_NONE){

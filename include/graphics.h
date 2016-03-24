@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include "entity.h" //knowing how to draw entities
+#include "camera.h" //camera stuff
 
 struct graphics{
 	SDL_Window *window;

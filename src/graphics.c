@@ -18,9 +18,10 @@ void initiateGraphics(struct graphics *g, const char* name){
     }
 	g->window = SDL_CreateWindow(
 		name,
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 480,
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1200, 900,
 		SDL_WINDOW_OPENGL
 	);
+    setCameraOffset(1200/2, 900/2);
 
     if(!g->window){
         printf("Failed to create error: %s\n", SDL_GetError());
@@ -79,7 +80,7 @@ static void renderWorld2D(){
     pent c = worldEntities.first;
     while(c != NULL){
         glBindTexture(GL_TEXTURE_2D, c->textureID);
-        int x = (int) c->x, y = (int) c->y;
+        int x = (int) c->x - cameraX, y = (int) c->y - cameraY;
         glBegin(GL_QUADS);
             glTexCoord2i(0, 0); glVertex3i(x, y, 0);
             glTexCoord2i(1, 0); glVertex3i(x + c->w, y, 0);

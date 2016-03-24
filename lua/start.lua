@@ -3,7 +3,7 @@
 player = newEntity(0):setControlled():spawn()
 
 enemies = {}
-for i = 1, 100 do
+for i = 1, 10 do
 	enemies[i] = newEntity(1)
 		:grantAI(1) --AI_WANDER
 		:spawn()

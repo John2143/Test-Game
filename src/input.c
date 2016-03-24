@@ -36,7 +36,7 @@ void keyEvent(SDL_KeyboardEvent key){
 		replaceFirst(code, 0);
 	}
 #ifdef DEBUG
-	printAll();
+    printAll();
 #endif
 }
 

@@ -8,26 +8,14 @@ struct worldLinkedList worldEntities = {
 static struct entityData *defaultEntites;
 
 void spawnEntity(pent e){
+    e->last = NULL;
     e->next = worldEntities.first;
     worldEntities.first = e;
 }
 
 void unspawnEntity(pent e){
-    pent currEnt = worldEntities.first, lastEnt = NULL;
-    while(currEnt != NULL){
-        if(currEnt == e){
-            //handles edge cases of this being the penultimante entity or this
-            //  being the first enemy
-            if(lastEnt){
-                lastEnt->next = e->next;
-            }else{
-                worldEntities.first = e->next;
-            }
-            return; //entity removed successfully
-        }
-        lastEnt = currEnt;
-        currEnt = currEnt->next;
-    }
+    if(e->last) e->last->next = e->next;
+    if(e->next) e->next->last = e->last;
     return; //entity not found
 }
 

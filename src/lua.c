@@ -42,13 +42,6 @@ static int luaUnspawnEntity(lua_State *L){
     return 1;
 }
 
-static int luaDeleteEntity(lua_State *L){
-    pent e = lua_touserdata(L, 1);
-    deleteEntity(e);
-    lua_pushvalue(L, 1);
-    return 1;
-}
-
 static int luaMoveEntity(lua_State *L){
     pent e = lua_touserdata(L, 1);
     double x = luaL_checknumber(L, 1);
@@ -134,7 +127,6 @@ void luaStart(){
         registerAPIFunction(L, "setControlled", luaSetControlledEntity);
         registerAPIFunction(L, "spawn", luaSpawnEntity);
         registerAPIFunction(L, "unspawn", luaUnspawnEntity);
-        registerAPIFunction(L, "delete", luaDeleteEntity);
         registerAPIFunction(L, "move", luaMoveEntity);
         registerAPIFunction(L, "setPos", luaSetEntityPos);
         registerAPIFunction(L, "kill", luaKillEntity);
