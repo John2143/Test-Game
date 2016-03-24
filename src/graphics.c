@@ -59,7 +59,7 @@ GLuint loadTexture(const char *name){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    printf("Loaded %s: %s", name, mode == GL_RGBA ? "RGBA" : "RGB");
+    /*printf("Loaded %s: %s\n", name, mode == GL_RGBA ? "RGBA" : "RGB");*/
     SDL_FreeSurface(texture);
     return id;
 }

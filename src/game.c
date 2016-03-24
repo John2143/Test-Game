@@ -27,6 +27,7 @@ static unsigned long clockDivisor;
 #include "logic.h"
 #include "global.h"
 #include "entity.h"
+#include "lua.h"
 
 static void getClockTime(clockType *val){
 #ifdef WIN32
@@ -72,22 +73,7 @@ int main(int argc, char** argv) {
 
 	initLogic();
     loadEntities();
-
-    pent player = newEntity(0);
-    spawnEntity(player);
-    setControlledEntity(player);
-
-    for(int i = 0; i < 100; i++){
-        pent e = newEntity(1);
-        grantAI(e, AI_WANDER);
-        spawnEntity(e);
-    }
-
-    for(int i = 0; i < 1; i++){
-        pent e = newEntity(1);
-        grantAI(e, AI_WANDER);
-        spawnEntity(e);
-    }
+    luaStart();
 
 	while(1){
 		if(SDL_PollEvent(&event)){
@@ -111,10 +97,8 @@ int main(int argc, char** argv) {
 	}
 CLEANUP:
 
-    unspawnEntity(player);
-    deleteEntity(player);
-
 	destroyGraphics(&g);
+    luaEnd();
     unloadEntities();
 
 	return 0;

@@ -51,7 +51,6 @@ typedef struct entity{
 
 struct worldLinkedList{
     pent first;
-    pent last;
 };
 
 extern struct worldLinkedList worldEntities;
@@ -60,6 +59,7 @@ void spawnEntity(pent e);
 void unspawnEntity(pent e);
 
 pent newEntity(int parentid);
+pent newEntityShell(int parentid, pent e);
 void deleteEntity(pent e);
 void moveEntity(pent e, double x, double y);
 void setEntityPos(pent e, double x, double y);

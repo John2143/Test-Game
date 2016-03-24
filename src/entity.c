@@ -3,19 +3,13 @@
 static unsigned int currentEntityID = 0;
 struct worldLinkedList worldEntities = {
     .first = NULL,
-    .last = NULL
 };
 
 static struct entityData *defaultEntites;
 
 void spawnEntity(pent e){
-    if(worldEntities.first == NULL){
-        worldEntities.first = e;
-    }else{
-        worldEntities.last->next = e;
-    }
-    worldEntities.last = e;
-    e->next = NULL;
+    e->next = worldEntities.first;
+    worldEntities.first = e;
 }
 
 void unspawnEntity(pent e){
@@ -37,8 +31,7 @@ void unspawnEntity(pent e){
     return; //entity not found
 }
 
-pent newEntity(int parentid){
-    pent e = malloc(sizeof(*e));
+pent newEntityShell(int parentid, pent e){
     e->globalid = currentEntityID++;
     e->parentid = parentid;
 
@@ -51,8 +44,11 @@ pent newEntity(int parentid){
     e->hp = e->stats.hp;
     e->facing = 0;
     e->ai = NULL;
-
     return e;
+}
+
+pent newEntity(int parentid){
+    return newEntityShell(parentid, malloc(sizeof(struct entity)));
 }
 
 void deleteEntity(pent e){
