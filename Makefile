@@ -11,4 +11,4 @@ prod:
 	$(CC) -O3 $(CFLAGS) $(SOURCES) $(LIBRARIES) -o $(EXECUTABLE)
 
 clean:
-	rm game.exe
+	rm $(EXECUTABLE).exe

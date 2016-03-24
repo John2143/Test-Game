@@ -50,23 +50,8 @@ pent newEntity(int parentid){
 
     e->hp = e->stats.hp;
     e->facing = 0;
+    e->ai = NULL;
 
-
-
-    /*typedef struct entity{*/
-        /*int parentid;*/
-        /*int globalid;*/
-
-        /*GLuint textureID;*/
-        /*//size_t textureOffset;*/
-
-        /*double x, y;*/
-        /*double facing;*/
-        /*int hp;*/
-        /*struct stats stats; //Customs stats: modified at spawn time*/
-
-        /*struct entity *next;*/
-    /*} *pent;*/
     return e;
 }
 
@@ -139,4 +124,12 @@ void setEntitySize(pent e, int scale){
 void embiggenEntity(pent e){
     e->w += 8;
     e->h += 8;
+}
+
+void grantAI(pent e, enum AI method){
+    if(e->ai != NULL) free(e->ai);
+    if(method != AI_NONE){
+        e->ai = malloc(sizeof(*e->ai));
+        e->ai->currentMethod = method;
+    }
 }

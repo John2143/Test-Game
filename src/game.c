@@ -45,8 +45,6 @@ static framerate getDiffClock(clockType a, clockType b){
 #endif
 }
 
-framerate fps;
-
 int main(int argc, char** argv) {
 	(void) argc;
 	(void) argv;
@@ -81,13 +79,13 @@ int main(int argc, char** argv) {
 
     for(int i = 0; i < 100; i++){
         pent e = newEntity(1);
-        e->ai = AI_WANDER;
+        grantAI(e, AI_WANDER);
         spawnEntity(e);
     }
 
     for(int i = 0; i < 1; i++){
         pent e = newEntity(1);
-        e->ai = AI_CHASE;
+        grantAI(e, AI_WANDER);
         spawnEntity(e);
     }
 
@@ -99,7 +97,7 @@ int main(int argc, char** argv) {
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
                 if(event.key.keysym.scancode == 0x14) goto CLEANUP; //TODO
-				keyEvent(event.key);
+                keyEvent(event.key);
 				break;
 			}
 		}
@@ -108,9 +106,8 @@ int main(int argc, char** argv) {
 
 		getClockTime(&frameEnd);
 		frameTime = getDiffClock(frameStart, frameEnd);
-		fps = 1 / frameTime;
 		frameStart = frameEnd;
-		gameUpdate(frameTime);
+        gameUpdate(frameTime);
 	}
 CLEANUP:
 

@@ -15,8 +15,6 @@ struct graphics{
 	int width;
 };
 
-extern framerate fps;
-
 void initiateGraphics(struct graphics *g, const char* name);
 void destroyGraphics(struct graphics *g);
 void renderGraphics(struct graphics *g);

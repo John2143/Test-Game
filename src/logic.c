@@ -68,16 +68,16 @@ static void controlEntity(framerate framems){
 static void tickAI(framerate framems){
     pent c = worldEntities.first;
     while(c != NULL){
-        if(c != controlledEntity){
+        if(c != controlledEntity && c->ai != NULL){
 
-switch(c->ai){
+switch(c->ai->currentMethod){
 case AI_NONE: break;
 case AI_WANDER: {
+    c->facing += (-1 + ((double) (rand() & 0xf) * .5)) * framems;
     moveEntityAng(c,
         c->facing,
-        getEntityMovespeed(c) * framems
+        getEntityMovespeed(c) * framems / 3
     );
-    c->facing += (-1 + ((double) (rand() & 0xf) * .5)) * framems;
 } break;
 case AI_CHASE: {
     pent closestPlayer = findClosestEntity(c, 0);

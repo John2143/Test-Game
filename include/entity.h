@@ -18,13 +18,16 @@ enum AI{
     AI_CHASE,
 };
 
+struct AIData{
+    enum AI currentMethod;
+};
+
 struct entityData{
     GLuint textureID;
     struct stats stats; //Default stats of a entity
     const char *name;
     int scale;
 };
-
 
 typedef struct entity{
     int globalid;
@@ -33,14 +36,13 @@ typedef struct entity{
     GLuint textureID;
     //size_t textureOffset;
 
-    int scale;
     double x, y;
     int w, h;
     double facing;
     int hp;
     struct stats stats; //Customs stats: modified at spawn time
 
-    enum AI ai;
+    struct AIData *ai;
     char *name;
 
     struct entity *next;
@@ -70,6 +72,8 @@ void embiggenEntity(pent e);
 const char *getName(pent e);
 
 pent findClosestEntity(pent to, int type);
+
+void grantAI(pent e, enum AI method);
 
 void loadEntities();
 void unloadEntities();
