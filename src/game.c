@@ -28,6 +28,8 @@ static unsigned long clockDivisor;
 #include "graphics.h"
 #include "logic.h"
 #include "lua.h"
+#include "map.h"
+#include "tile.h"
 
 static void getClockTime(clockType *val){
 #ifdef WIN32
@@ -49,6 +51,7 @@ static framerate getDiffClock(clockType a, clockType b){
 int main(int argc, char** argv) {
 	(void) argc;
 	(void) argv;
+    srand(time(NULL));
 #ifdef WIN32
 	{
 		LARGE_INTEGER divisor;
@@ -73,8 +76,9 @@ int main(int argc, char** argv) {
 
 	initLogic();
     loadEntities();
+    loadTileTextures();
+    initializeWorld();
     luaStart();
-
 
 	while(1){
 		if(SDL_PollEvent(&event)){
@@ -89,7 +93,7 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		renderGraphics(&g);
+		renderGraphics(&g, frameTime);
 
 		getClockTime(&frameEnd);
 		frameTime = getDiffClock(frameStart, frameEnd);
@@ -100,6 +104,8 @@ int main(int argc, char** argv) {
 CLEANUP:
 
     luaEnd();
+    uninitializeWorld();
+    unloadTileTextures();
     unloadEntities();
 	destroyGraphics(&g);
 

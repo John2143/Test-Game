@@ -67,15 +67,15 @@ void loadEntities(){
     defaultEntites = malloc(2 * sizeof(*defaultEntites));
 
     defaultEntites[0].name = "Player";
-    defaultEntites[0].textureID = loadTexture(assetFolderPath "meme.png");
+    defaultEntites[0].textureID = loadTexture(assetFolderPath "player.png");
     defaultEntites[0].stats = (struct stats) {
-        .hp = 100, .def = 0, .agi = 50
+        .hp = 100, .def = 0, .agi = 500
     };
 
     defaultEntites[1].name = "testname";
     defaultEntites[1].textureID = loadTexture(assetFolderPath "meme.png");
     defaultEntites[1].stats = (struct stats) {
-        .hp = 100, .def = 0, .agi = 0
+        .hp = 100, .def = 0, .agi = 20
     };
 }
 

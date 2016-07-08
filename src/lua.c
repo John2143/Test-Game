@@ -88,9 +88,10 @@ static int luaEmbiggenEntity(lua_State *L){
 }
 
 static int luaFindClosestEntity(lua_State *L){
-    pent e = lua_touserdata(L, 1);
-    int type = (int) luaL_checknumber(L, 2);
-    pent ret = findClosestEntity(e, type);
+    (void) L;
+    /*pent e = lua_touserdata(L, 1);*/
+    /*int type = (int) luaL_checknumber(L, 2);*/
+    /*pent ret = findClosestEntity(e, type);*/
     //TODO ????
     return 1;
 }
@@ -114,6 +115,7 @@ void startNewMetatable(lua_State *L, const char *name){
     lua_pushstring(L, "__index");
     lua_newtable(L); //Unknown number of API funcs
 }
+
 void endNewMetatable(lua_State *L){
     lua_settable(L, -3);
 }
@@ -137,7 +139,6 @@ void luaStart(){
         registerAPIFunction(L, "grantAI", luaGrantAI);
     endNewMetatable(L);
     /*registerAPIFunction(L, "__gc", )*/
-
 
     lua_register(L, "newEntity", luaNewEntity);
 

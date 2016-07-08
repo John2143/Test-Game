@@ -1,9 +1,9 @@
 --This file gets run when the game starts
 
-player = newEntity(0):setControlled():spawn()
+player = newEntity(0):setControlled():spawn():setPos(700, 500)
 
 enemies = {}
-for i = 1, 10 do
+for i = 1, 100 do
 	enemies[i] = newEntity(1)
 		:grantAI(1) --AI_WANDER
 		:spawn()

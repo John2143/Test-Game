@@ -6,8 +6,22 @@
 #include <GL/GLU.h>
 #include <stdio.h>
 
-#include "entity.h" //knowing how to draw entities
-#include "camera.h" //camera stuff
+#include "entity.h"
+#include "camera.h"
+#include "tile.h"
+#include "map.h"
+
+#define TILEPIXELS (4 * 8)
+
+typedef GLuint fontID;
+struct font{
+    fontID chars[128];
+    unsigned char kerning[128];
+    int bits;
+};
+
+extern struct font *globalFont;
+struct font *loadFont(const char *name, int bits, int width);
 
 struct graphics{
 	SDL_Window *window;
@@ -18,9 +32,17 @@ struct graphics{
 
 void initiateGraphics(struct graphics *g, const char* name);
 void destroyGraphics(struct graphics *g);
-void renderGraphics(struct graphics *g);
-int renderText(const char *text, int x, int y, int scale);
+void renderGraphics(struct graphics *g, framerate frameTime);
 void setVSync(bool vsync);
-GLuint loadTexture(const char *name);
+void renderSquareTexture(textureID textureid, int x, int y, int w, int h);
+
+enum justification{
+    JUSTIFY_LEFT, JUSTIFY_RIGHT, JUSTIFY_CENTER
+};
+
+int renderChar    (const struct font *f, const unsigned char c, int x, int y, int scale);
+int renderText    (const struct font *f, const char *text,      int x, int y, int scale);
+int renderTextJust(const struct font *f, const char *text,      int x, int y, int scale, enum justification just);
+int textLength    (const struct font *f, const char *text,                    int scale);
 
 #endif
