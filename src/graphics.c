@@ -78,27 +78,20 @@ struct font *loadFont(const char *name, int bits, int width){
         fclose(fp);
     }
 
-    int dataMode = fullFont->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
-    int pixelBits = fullFont->format->BitsPerPixel;
+    SDL_SetSurfaceBlendMode(fullFont, SDL_BLENDMODE_NONE | SDL_BLENDMODE_BLEND);
+    SDL_SetColorKey(fullFont, SDL_TRUE, SDL_MapRGB(fullFont->format, 0, 0, 0));
 
     for(int i = 0, ty = 0; ; ty++){
         for(int tx = 0; tx < width; tx++){
-            SDL_Rect srcrect = {.x = tx * bits,
-                                .y = ty * bits,
+            SDL_Rect srcrect = {.x = tx * bits, .y = ty * bits,
                                 .w = newFont->kerning[i], .h = bits};
 
-            SDL_Surface *fontLetter = SDL_CreateRGBSurface(0, srcrect.w, srcrect.h, pixelBits, 0, 0, 0, 0);
+            SDL_Surface *fontLetter = SDL_CreateRGBSurface(0, srcrect.w, srcrect.h, 32, 0xff000000, 0xff0000, 0xff00, 0xff);
+            //TODO better way to copy textures
+            SDL_FillRect(fontLetter, NULL, SDL_MapRGB(fontLetter->format, 0, 0, 0));
             SDL_BlitSurface(fullFont, &srcrect, fontLetter, NULL);
 
-            glGenTextures(1, &newFont->chars[i]);
-            glBindTexture(GL_TEXTURE_2D, newFont->chars[i]);
-
-            glTexImage2D(GL_TEXTURE_2D, 0, dataMode, fontLetter->w, fontLetter->h, 0, dataMode, GL_UNSIGNED_BYTE, fontLetter->pixels);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-            SDL_FreeSurface(fontLetter);
-
+            newFont->chars[i] = loadTextureFromSurface(fontLetter);
             if(++i >= 128) goto FINISH;
         }
     }
@@ -110,7 +103,14 @@ FINISH:
 
 textureID loadTexture(const char *name){
     SDL_Surface *texture = IMG_Load(name);
+    if(texture == NULL){
+        printf("Failed to load image: %s\n", IMG_GetError());
+        return -1;
+    }
+    return loadTextureFromSurface(texture);
+}
 
+textureID loadTextureFromSurface(SDL_Surface *texture){
     GLuint id = 0;
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
@@ -173,11 +173,24 @@ static void renderWorld2D(struct graphics *g){
     }
 }
 
+
 static void renderStatusBar(struct graphics *g, framerate frameTime){
     char buf[128];
     sprintf(buf, "%.0f FPS", 1 / frameTime);
     renderTextJust(globalFont, buf, g->width, 0, 4, JUSTIFY_RIGHT);
+
+#ifdef DEBUGFONT
+    int y = 0;
+#define TEST(a) renderTextJust(globalFont, a, g->width, y+=32, 4, JUSTIFY_RIGHT)
+    TEST("cwm fjordbank glyphs vext quiz");
+    TEST("CWM FJORDBANK GLYPHS VEXT QUIZ");
+    TEST("Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
+    TEST(" !\"#$%&'()*+,-./0123456789:;<=>?");
+    TEST("@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~.");
+#undef TEST
+#endif
 }
+
 
 static void renderInterface(struct graphics *g){
     (void) g;

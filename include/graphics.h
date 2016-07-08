@@ -36,6 +36,8 @@ void renderGraphics(struct graphics *g, framerate frameTime);
 void setVSync(bool vsync);
 void renderSquareTexture(textureID textureid, int x, int y, int w, int h);
 
+textureID loadTextureFromSurface(SDL_Surface *texture);
+
 enum justification{
     JUSTIFY_LEFT, JUSTIFY_RIGHT, JUSTIFY_CENTER
 };
