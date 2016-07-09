@@ -9,7 +9,7 @@
 
 extern struct tile *globalTileArray;
 
-typedef unsigned short tileid;
+typedef unsigned char tileid;
 struct tile{
     textureID texture;
 };

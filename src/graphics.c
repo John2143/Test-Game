@@ -8,7 +8,7 @@ static void logWindowDetails(const char * detail, SDL_DisplayMode *mode){
 	);
 }
 
-static textureID texture;
+static textureID areaTexture;
 struct font *globalFont;
 static GLint LODlevel = 0;
 
@@ -47,8 +47,8 @@ void initiateGraphics(struct graphics *g, const char* name){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    texture = loadTexture(assetFolderPath "meme.png");
     globalFont = loadFont(assetFolderPath "font", 8, 16);
+    areaTexture = loadTexture(assetFolderPath "areaHuge.png");
 }
 
 struct font *loadFont(const char *name, int bits, int width){
@@ -117,8 +117,10 @@ textureID loadTextureFromSurface(SDL_Surface *texture){
 
     int mode = texture->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
     glTexImage2D(GL_TEXTURE_2D, LODlevel, mode, texture->w, texture->h, 0, mode, GL_UNSIGNED_BYTE, texture->pixels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);*/
+    /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);*/
 
     SDL_FreeSurface(texture);
     return (textureID) id; //Cast for warning protection
@@ -175,12 +177,18 @@ static void renderWorld2D(struct graphics *g){
 
 
 static void renderStatusBar(struct graphics *g, framerate frameTime){
+    glColor3f(1.0, 1.0, 1.0);
+
     char buf[128];
+    int y = 0;
     sprintf(buf, "%.0f FPS", 1 / frameTime);
     renderTextJust(globalFont, buf, g->width, 0, 4, JUSTIFY_RIGHT);
+    if(cameraFollowing){
+        sprintf(buf, "%.1f, %.1f", cameraFollowing->x, cameraFollowing->y);
+        renderTextJust(globalFont, buf, g->width, y=+32, 4, JUSTIFY_RIGHT);
+    }
 
 #ifdef DEBUGFONT
-    int y = 0;
 #define TEST(a) renderTextJust(globalFont, a, g->width, y+=32, 4, JUSTIFY_RIGHT)
     TEST("cwm fjordbank glyphs vext quiz");
     TEST("CWM FJORDBANK GLYPHS VEXT QUIZ");
@@ -191,13 +199,104 @@ static void renderStatusBar(struct graphics *g, framerate frameTime){
 #endif
 }
 
+#define glRectiWH(x, y, w, h) renderSquareTexture(areaTexture, x, y, w, h)
+/*#define glRectiWH(x, y, w, h) glRecti(x, y, (x) + (w), (y) + (h))*/
+
+#define xl (infoBoxX + bu)
+#define xr (infoBoxX + infoBoxWidth - bu)
+
+#define PANELCOLOR glColor3f(.1, .1, .1)
+#define WHITECOLOR glColor3f(1., 1., 1.)
+#define BASICPANEL(height) \
+    PANELCOLOR; \
+    glRectiWH(xl, y, infoBoxWidth - dbu, height); \
+    nexty = height;
+#define ENDPANEL() y += nexty + bu;
+#define ENDPANELW(a) y += a;
+
+#define BUFFERI(var) sprintf(tbuf, "%i", var);
 
 static void renderInterface(struct graphics *g){
     (void) g;
+    pent lp;
+    if((lp = cameraFollowing)){
+
+        char tbuf[128];
+        const int bu = 10;
+        const int dbu = bu * 2;
+        const int tbu = 4;
+        const int dtbu = tbu * 2;
+        const int infoBoxWidth = 200;
+        const int infoBoxHeight = 400;
+        const int infoBoxX = 0;
+        const int infoBoxY = 20;
+
+        int y = bu + infoBoxY, nexty;
+
+        glColor3f(.2, .2, .2);
+        glRectiWH(infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight);
+
+
+#define DISBAR(amt, max, r, g, b) {\
+        BASICPANEL(16 + dtbu); \
+        float pct = (float) (amt) / (float) (max); \
+        glColor3f(r, g, b); \
+        glRectiWH(infoBoxX + bu, y, (int)((infoBoxWidth - dbu) * pct), 16 + dtbu); \
+        glColor3f(1., 1., 1.); \
+        BUFFERI(amt); \
+        renderTextJust(globalFont, tbuf, xl + tbu, y + tbu, 2, JUSTIFY_LEFT); \
+        sprintf(tbuf, "%.0f%%", pct * 100); \
+        renderTextJust(globalFont, tbuf, xr - tbu, y + tbu, 2, JUSTIFY_RIGHT); \
+        ENDPANEL(); \
+        }
+
+
+        DISBAR(lp->hp, getEntityMaxHealth(lp), .8, .0, .0);
+        DISBAR(lp->abi, getEntityMaxAbility(lp), .6, .0, 1.);
+
+        //Start stats panel
+        int statsText = (16 + tbu);
+        BASICPANEL(statsText * 4 + tbu);
+
+        int xoffset;
+
+#define STDISPL(name, variable, r, g, b) \
+        BUFFERI(variable); \
+        WHITECOLOR; \
+        xoffset = renderTextJust(globalFont, name " ", xl + tbu, y + tbu, 2, JUSTIFY_LEFT); \
+        glColor3f(r, g, b); \
+        renderTextJust(globalFont, tbuf, xl + tbu + xoffset, y + tbu, 2, JUSTIFY_LEFT);
+
+#define STDISPR(name, variable, r, g, b) \
+        BUFFERI(variable); \
+        WHITECOLOR; \
+        xoffset = renderTextJust(globalFont, " " name, xr - tbu, y + tbu, 2, JUSTIFY_RIGHT); \
+        glColor3f(r, g, b); \
+        renderTextJust(globalFont, tbuf, xr - tbu - xoffset, y + tbu, 2, JUSTIFY_RIGHT);
+
+        STDISPL("AGI", lp->stats.agi, .0, 1., .3);
+        STDISPR("MS", getEntityMovespeed(lp), .5, .5, .5);
+        y += statsText;
+
+        STDISPL("VIT", lp->stats.vit, .8, .0, .0);
+        STDISPR("HP", getEntityMaxHealth(lp), .8, .0, .0);
+        y += statsText;
+
+        STDISPL("ABI", lp->stats.abi, .6, .0, 1.);
+        STDISPR("POOL", getEntityMaxAbility(lp), .6, .0, 1.);
+        y += statsText;
+
+        STDISPL("DEF", lp->stats.def, .7, .7, .7);
+
+        ENDPANELW(tbu + bu + statsText); //END stats panel
+
+    }
 }
 
 void renderGraphics(struct graphics *g, framerate frameTime){
-	glClear(GL_COLOR_BUFFER_BIT);
+#ifdef DEBUG
+    glClear(GL_COLOR_BUFFER_BIT);
+#endif
 
 	glPushMatrix();
 		glOrtho(0., g->width, g->height, 0., 0., 1.);

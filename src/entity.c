@@ -29,9 +29,11 @@ pent newEntityShell(int parentid, pent e){
     setEntityPos(e, 200, 200);
     setEntitySize(e, 4);
 
-    e->hp = e->stats.hp;
+    setEntityHealth(e, getEntityMaxHealth(e));
+    setEntityAbility(e, getEntityMaxAbility(e));
+
     e->facing = 0;
-    e->ai = NULL;
+    grantAI(e, AI_NONE);
     return e;
 }
 
@@ -59,8 +61,16 @@ void moveEntityAng(pent e, double ang, double del){
 }
 
 void killEntity(pent e){
-    e->hp = 0;
+    setEntityHealth(e, 0);
     unspawnEntity(e);
+}
+
+void setEntityHealth(pent e, int hp){
+    e->hp = hp;
+}
+
+void setEntityAbility(pent e, int abi){
+    e->abi = abi;
 }
 
 void loadEntities(){
@@ -69,13 +79,13 @@ void loadEntities(){
     defaultEntites[0].name = "Player";
     defaultEntites[0].textureID = loadTexture(assetFolderPath "player.png");
     defaultEntites[0].stats = (struct stats) {
-        .hp = 100, .def = 0, .agi = 500
+        .vit = 10, .def = 5, .agi = 500, .abi = 5
     };
 
     defaultEntites[1].name = "testname";
     defaultEntites[1].textureID = loadTexture(assetFolderPath "meme.png");
     defaultEntites[1].stats = (struct stats) {
-        .hp = 100, .def = 0, .agi = 20
+        .vit = 0, .def = 0, .agi = 0, .abi = 0
     };
 }
 
@@ -85,6 +95,14 @@ void unloadEntities(){
 
 int getEntityMovespeed(pent e){
     return e->stats.agi * 2 + 200;
+}
+
+int getEntityMaxHealth(pent e){
+    return e->stats.vit * 10 + 10;
+}
+
+int getEntityMaxAbility(pent e){
+    return e->stats.abi * 5;
 }
 
 pent findClosestEntity(pent to, int type){
@@ -112,6 +130,7 @@ void embiggenEntity(pent e){
 
 void grantAI(pent e, enum AI method){
     if(e->ai != NULL) free(e->ai);
+    e->ai = NULL;
     if(method != AI_NONE){
         e->ai = malloc(sizeof(*e->ai));
         e->ai->currentMethod = method;

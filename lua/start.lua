@@ -1,6 +1,10 @@
 --This file gets run when the game starts
 
-player = newEntity(0):setControlled():spawn():setPos(700, 500)
+player = newEntity(0)
+    :setControlled()
+    :spawn()
+    :setPos(700, 500)
+    :setHealth(90)
 
 enemies = {}
 for i = 1, 100 do

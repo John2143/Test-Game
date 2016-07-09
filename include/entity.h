@@ -9,7 +9,7 @@
 GLuint loadTexture(const char *name);
 
 struct stats{
-    int def, agi, hp;
+    int def, agi, vit, abi;
 };
 
 enum AI{
@@ -39,7 +39,7 @@ typedef struct entity{
     double x, y;
     int w, h;
     double facing;
-    int hp;
+    int hp, abi;
     struct stats stats; //Customs stats: modified at spawn time
 
     struct AIData *ai;
@@ -67,7 +67,13 @@ void setEntityPos(pent e, double x, double y);
 void moveEntityAng(pent e, double ang, double del);
 void killEntity(pent e);
 
+void setEntityHealth(pent e, int hp);
+void setEntityAbility(pent e, int abi); //nl
+
 int getEntityMovespeed(pent e);
+int getEntityMaxHealth(pent e); //NL
+int getEntityMaxAbility(pent e); //NL
+
 void setEntitySize(pent e, int scale);
 void embiggenEntity(pent e);
 const char *getName(pent e);

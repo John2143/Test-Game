@@ -116,6 +116,12 @@ void startNewMetatable(lua_State *L, const char *name){
     lua_newtable(L); //Unknown number of API funcs
 }
 
+static int luaSetHealth(lua_State *L){
+    pent e = lua_touserdata(L, 1);
+    setEntityHealth(e, (int) luaL_checknumber(L, 2));
+    return 1;
+}
+
 void endNewMetatable(lua_State *L){
     lua_settable(L, -3);
 }
@@ -137,6 +143,7 @@ void luaStart(){
         registerAPIFunction(L, "embiggen", luaEmbiggenEntity);
         registerAPIFunction(L, "findClosestEntity", luaFindClosestEntity);
         registerAPIFunction(L, "grantAI", luaGrantAI);
+        registerAPIFunction(L, "setHealth", luaSetHealth);
     endNewMetatable(L);
     /*registerAPIFunction(L, "__gc", )*/
 
