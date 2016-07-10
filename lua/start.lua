@@ -12,6 +12,8 @@ for i = 1, 100 do
 		:grantAI(1) --AI_WANDER
 		:spawn()
 end
+
+enemies[52]:setControlled();
 table.insert(enemies, newEntity(1):grantAI(2):spawn()) --AI_CHASE
 
 --Old C Code:

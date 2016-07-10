@@ -2,7 +2,6 @@
 #define entity_H
 
 #include <math.h> //sin, cos
-#include <GL/GLU.h> //for GLuint textures
 #include <stdlib.h> //malloc etc
 
 #include "global.h" //asset folder
@@ -16,6 +15,7 @@ enum AI{
     AI_NONE,
     AI_WANDER,
     AI_CHASE,
+    AI_BULLET,
 };
 
 struct AIData{
@@ -23,7 +23,7 @@ struct AIData{
 };
 
 struct entityData{
-    GLuint textureID;
+    textureID textureID;
     struct stats stats; //Default stats of a entity
     const char *name;
     int scale;

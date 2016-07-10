@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "tile.h"
 #include "map.h"
+#include "input.h"
 
 #define TILEPIXELS (4 * 8)
 
@@ -26,13 +27,13 @@ struct font *loadFont(const char *name, int bits, int width);
 struct graphics{
 	SDL_Window *window;
 	SDL_GLContext *glcontext;
-	int height;
-	int width;
+	int width, height;
+	int windowWidth, windowHeight;
 };
 
 void initiateGraphics(struct graphics *g, const char* name);
 void destroyGraphics(struct graphics *g);
-void renderGraphics(struct graphics *g, framerate frameTime);
+void renderGraphics(struct graphics *g, framerate frameTime, framerate appTime);
 void setVSync(bool vsync);
 void renderSquareTexture(textureID textureid, int x, int y, int w, int h);
 

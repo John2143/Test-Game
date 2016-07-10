@@ -74,7 +74,7 @@ void setEntityAbility(pent e, int abi){
 }
 
 void loadEntities(){
-    defaultEntites = malloc(2 * sizeof(*defaultEntites));
+    defaultEntites = malloc(50 * sizeof(*defaultEntites));
 
     defaultEntites[0].name = "Player";
     defaultEntites[0].textureID = loadTexture(assetFolderPath "player.png");
@@ -85,6 +85,12 @@ void loadEntities(){
     defaultEntites[1].name = "testname";
     defaultEntites[1].textureID = loadTexture(assetFolderPath "meme.png");
     defaultEntites[1].stats = (struct stats) {
+        .vit = 0, .def = 0, .agi = 0, .abi = 0
+    };
+
+    defaultEntites[2].name = "bullet";
+    defaultEntites[2].textureID = loadTexture(assetFolderPath "bullet.png");
+    defaultEntites[2].stats = (struct stats) {
         .vit = 0, .def = 0, .agi = 0, .abi = 0
     };
 }
@@ -129,10 +135,11 @@ void embiggenEntity(pent e){
 }
 
 void grantAI(pent e, enum AI method){
-    if(e->ai != NULL) free(e->ai);
-    e->ai = NULL;
     if(method != AI_NONE){
+        if(e->ai != NULL) free(e->ai);
         e->ai = malloc(sizeof(*e->ai));
         e->ai->currentMethod = method;
+    }else{
+        e->ai = NULL;
     }
 }

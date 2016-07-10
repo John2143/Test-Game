@@ -62,16 +62,20 @@ int main(int argc, char** argv) {
 	clockDivisor = CLOCKS_PER_SEC;
 #endif
 	printf("Starting\nClock divisor: %lu\n", clockDivisor);
-	struct graphics g;
 	SDL_Event event;
 
+	struct graphics g = {
+        .width = 1200,
+        .height = 900,
+    };
 	initiateGraphics(&g, "Test window");
+
 	if(!g.window) goto CLEANUP;
 	/*thread t;*/
 	/*newThread(test, NULL, &t);*/
 
-	clockType frameStart, frameEnd;
-	framerate frameTime = 0;
+	clockType frameStart, frameEnd, gameStart;
+	framerate frameTime = 0, appTime = 0;
 	getClockTime(&frameStart);
 
 	initLogic();
@@ -80,7 +84,17 @@ int main(int argc, char** argv) {
     initializeWorld();
     luaStart();
 
+    getClockTime(&gameStart);
+
 	while(1){
+        cameraTick(frameTime, appTime);
+		renderGraphics(&g, frameTime, appTime);
+
+        oldMouseState = mouseState;
+        mouseState = SDL_GetMouseState(&mouseX, &mouseY);
+        if(oldMouseState != mouseState){
+            mouseEvent();
+        }
 		if(SDL_PollEvent(&event)){
 			switch(event.type){
 			case SDL_QUIT:
@@ -89,17 +103,15 @@ int main(int argc, char** argv) {
 			case SDL_KEYUP:
                 if(event.key.keysym.scancode == 0x14) goto CLEANUP; //TODO
                 keyEvent(event.key);
-				break;
+            break;
 			}
 		}
 
-		renderGraphics(&g, frameTime);
-
 		getClockTime(&frameEnd);
 		frameTime = getDiffClock(frameStart, frameEnd);
+        appTime = getDiffClock(gameStart, frameEnd);
 		frameStart = frameEnd;
-        gameUpdate(frameTime);
-        cameraTick(frameTime);
+        gameUpdate(frameTime, appTime);
 	}
 CLEANUP:
 

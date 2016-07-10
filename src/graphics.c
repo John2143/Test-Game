@@ -9,7 +9,7 @@ static void logWindowDetails(const char * detail, SDL_DisplayMode *mode){
 }
 
 static textureID areaTexture;
-struct font *globalFont;
+struct font *globalFont, *globalMonoFont;
 static GLint LODlevel = 0;
 
 void initiateGraphics(struct graphics *g, const char* name){
@@ -19,10 +19,10 @@ void initiateGraphics(struct graphics *g, const char* name){
     }
 	g->window = SDL_CreateWindow(
 		name,
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1200, 900,
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, g->width, g->height,
 		SDL_WINDOW_OPENGL
 	);
-    setCameraOffset(1200/2, 900/2);
+    setCameraOffset(g->width/2, g->height/2);
 
     if(!g->window){
         printf("Failed to create error: %s\n", SDL_GetError());
@@ -38,8 +38,8 @@ void initiateGraphics(struct graphics *g, const char* name){
 	logWindowDetails("Default", &mode);
 
 	g->glcontext = SDL_GL_CreateContext(g->window);
-	g->height = mode.h;
-	g->width = mode.w;
+	g->windowHeight = mode.h;
+	g->windowWidth = mode.w;
 	glClearColor(0, 0, 0, 1);
 	setVSync(0);
 
@@ -48,6 +48,7 @@ void initiateGraphics(struct graphics *g, const char* name){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     globalFont = loadFont(assetFolderPath "font", 8, 16);
+    globalMonoFont = loadFont(assetFolderPath "fontMono", 8, 16);
     areaTexture = loadTexture(assetFolderPath "areaHuge.png");
 }
 
@@ -144,6 +145,7 @@ void renderSquareTexture(textureID textureid, int x, int y, int w, int h){
     glEnd();
 }
 
+static int renderedEnts = 0;
 static void renderWorld2D(struct graphics *g){
 
     int startx, starty, endx, endy;
@@ -168,25 +170,37 @@ static void renderWorld2D(struct graphics *g){
     }
 
     pent c = worldEntities.first;
+    renderedEnts = 0;
     while(c != NULL){
         int x = (int) c->x - cameraX, y = (int) c->y - cameraY;
-        renderSquareTexture(c->textureID, x, y, c->w, c->h);
+        if(x > -c->w && x < g->width  + c->w &&
+           y > -c->h && y < g->height + c->h){
+            renderSquareTexture(c->textureID, x - c->w/2, y - c->w/2, c->w, c->h);
+            renderedEnts++;
+        }
         c = c->next;
     }
 }
 
-
-static void renderStatusBar(struct graphics *g, framerate frameTime){
+static void renderStatusBar(struct graphics *g, framerate frameTime, framerate appTime){
     glColor3f(1.0, 1.0, 1.0);
 
     char buf[128];
     int y = 0;
-    sprintf(buf, "%.0f FPS", 1 / frameTime);
-    renderTextJust(globalFont, buf, g->width, 0, 4, JUSTIFY_RIGHT);
+    framerate fps = MIN(1/frameTime, 1000);
+    sprintf(buf, "%.2fs %.4f spf %.0f FPS", appTime, frameTime, fps);
+    renderTextJust(globalMonoFont, buf, g->width, 0, 4, JUSTIFY_RIGHT);
     if(cameraFollowing){
-        sprintf(buf, "%.1f, %.1f", cameraFollowing->x, cameraFollowing->y);
-        renderTextJust(globalFont, buf, g->width, y=+32, 4, JUSTIFY_RIGHT);
+        sprintf(buf, "%.1f, %.1f pxy", cameraFollowing->x, cameraFollowing->y);
+        renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
     }
+    int rmx, rmy;
+    worldMousePosition(&rmx, &rmy);
+    sprintf(buf, "%i %i, %i mxy %i, %i rmxy", mouseState, mouseX, mouseY, rmx, rmy);
+    renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
+
+    sprintf(buf, "E: %i", renderedEnts);
+    renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
 
 #ifdef DEBUGFONT
 #define TEST(a) renderTextJust(globalFont, a, g->width, y+=32, 4, JUSTIFY_RIGHT)
@@ -194,7 +208,8 @@ static void renderStatusBar(struct graphics *g, framerate frameTime){
     TEST("CWM FJORDBANK GLYPHS VEXT QUIZ");
     TEST("Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
     TEST(" !\"#$%&'()*+,-./0123456789:;<=>?");
-    TEST("@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~.");
+    TEST("@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_");
+    TEST("`abcdefghijklmnopqrstuvwxyz{|}~.");
 #undef TEST
 #endif
 }
@@ -252,13 +267,16 @@ static void renderInterface(struct graphics *g){
 
 
         DISBAR(lp->hp, getEntityMaxHealth(lp), .8, .0, .0);
-        DISBAR(lp->abi, getEntityMaxAbility(lp), .6, .0, 1.);
+        int amt;
+        if((amt = getEntityMaxAbility(lp))){
+            DISBAR(lp->abi, amt, .6, .0, 1.);
+        }
 
         //Start stats panel
         int statsText = (16 + tbu);
         BASICPANEL(statsText * 4 + tbu);
 
-        int xoffset;
+        int xoffset = 0;
 
 #define STDISPL(name, variable, r, g, b) \
         BUFFERI(variable); \
@@ -293,7 +311,7 @@ static void renderInterface(struct graphics *g){
     }
 }
 
-void renderGraphics(struct graphics *g, framerate frameTime){
+void renderGraphics(struct graphics *g, framerate frameTime, framerate appTime){
 #ifdef DEBUG
     glClear(GL_COLOR_BUFFER_BIT);
 #endif
@@ -303,7 +321,7 @@ void renderGraphics(struct graphics *g, framerate frameTime){
 		glColor3f(1.0f, 1.0f, 1.0f);
         renderWorld2D(g);
 		renderInterface(g);
-        renderStatusBar(g, frameTime);
+        renderStatusBar(g, frameTime, appTime);
 	glPopMatrix();
 
 	SDL_GL_SwapWindow(g->window);

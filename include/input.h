@@ -9,6 +9,10 @@
 
 #define MAXKEYSDOWN 16
 
+extern int mouseX, mouseY;
+extern Uint32 mouseState, oldMouseState;
+
+void mouseEvent();
 void keyEvent(SDL_KeyboardEvent key);
 int isKeyPressed(uint32_t code);
 

@@ -1,5 +1,7 @@
 #include "input.h"
 
+int mouseX, mouseY;
+Uint32 mouseState = 0, oldMouseState = 0;
 uint32_t keysdown[MAXKEYSDOWN];
 
 static int replaceFirst(uint32_t a, uint32_t b){
@@ -14,6 +16,9 @@ static int replaceFirst(uint32_t a, uint32_t b){
 
 #ifdef DEBUG
 static void printAll(){
+
+    if(1) return;
+
 	for(int i = 0; i < MAXKEYSDOWN; i++){
 		if(keysdown[i]){
 			printf("%.3x", keysdown[i]);
@@ -38,6 +43,15 @@ void keyEvent(SDL_KeyboardEvent key){
 #ifdef DEBUG
     printAll();
 #endif
+}
+
+void mouseEvent(){
+    Uint32 changed = mouseState ^ oldMouseState;
+    if(changed){
+        if(changed & SDL_BUTTON(SDL_BUTTON_LEFT)){
+            return;
+        }
+    }
 }
 
 int isKeyPressed(uint32_t code){

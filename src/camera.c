@@ -19,9 +19,18 @@ void setCameraOffset(int x, int y){
 void setCameraZoom(double zoom){
     (void) zoom;
 }
-void cameraTick(framerate framems){
-    (void) framems;
+void cameraTick(framerate framems, framerate appTime){
+    (void) framems, (void) appTime;
     if(cameraFollowing != NULL){
-        cameraMoveTo(cameraFollowing->x - cameraXOffset - cameraFollowing->w/2, cameraFollowing->y - cameraYOffset - cameraFollowing->h/2);
+        cameraMoveTo(cameraFollowing->x - cameraXOffset, cameraFollowing->y - cameraYOffset);
     }
+}
+void screenToWorld(int x, int y, int *relx, int *rely){
+    //TODO make this not so hacky
+    if(relx) *relx = (cameraX + x);
+    if(rely) *rely = (cameraY + y);
+}
+
+void worldMousePosition(int *relx, int *rely){
+    screenToWorld(mouseX, mouseY, relx, rely);
 }

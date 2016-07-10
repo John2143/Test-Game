@@ -7,7 +7,7 @@
 #include "entity.h" //pent and entity movement
 #include "camera.h" //cameraAng changes
 
-void gameUpdate(framerate framems);
+void gameUpdate(framerate framems, framerate appTime);
 void initLogic();
 
 void setControlledEntity(pent e);
