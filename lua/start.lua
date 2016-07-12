@@ -10,11 +10,15 @@ enemies = {}
 for i = 1, 100 do
 	enemies[i] = newEntity(1)
 		:grantAI(1) --AI_WANDER
+        :setPos(300, 500)
 		:spawn()
 end
 
-enemies[52]:setControlled();
 table.insert(enemies, newEntity(1):grantAI(2):spawn()) --AI_CHASE
+
+enemies[1]:unspawn()
+enemies[55]:unspawn()
+enemies[101]:unspawn()
 
 --Old C Code:
 -- pent player = newEntity(0);

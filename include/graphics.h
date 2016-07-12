@@ -11,6 +11,7 @@
 #include "tile.h"
 #include "map.h"
 #include "input.h"
+#include "bullet.h"
 
 #define TILEPIXELS (4 * 8)
 
@@ -35,7 +36,9 @@ void initiateGraphics(struct graphics *g, const char* name);
 void destroyGraphics(struct graphics *g);
 void renderGraphics(struct graphics *g, framerate frameTime, framerate appTime);
 void setVSync(bool vsync);
-void renderSquareTexture(textureID textureid, int x, int y, int w, int h);
+
+void renderSquareTexture   (textureID textureid, int x, int y, int w, int h);
+void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang);
 
 textureID loadTextureFromSurface(SDL_Surface *texture);
 

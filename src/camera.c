@@ -1,14 +1,15 @@
 #include "camera.h"
 
-double cameraAng, cameraX, cameraY;
+position cameraX, cameraY;
+angle cameraAng;
 pent cameraFollowing;
 int cameraYOffset, cameraXOffset;
-double cameraZoom;
+angle cameraZoom;
 
 void cameraFollowEntity(pent e){
     cameraFollowing = e;
 }
-void cameraMoveTo(double x, double y){
+void cameraMoveTo(position x, position y){
     cameraX = x;
     cameraY = y;
 }
@@ -16,7 +17,7 @@ void setCameraOffset(int x, int y){
     cameraXOffset = x;
     cameraYOffset = y;
 }
-void setCameraZoom(double zoom){
+void setCameraZoom(angle zoom){
     (void) zoom;
 }
 void cameraTick(framerate framems, framerate appTime){

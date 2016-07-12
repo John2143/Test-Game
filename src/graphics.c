@@ -135,17 +135,30 @@ void destroyGraphics(struct graphics *g){
 	SDL_Quit();
 }
 
-void renderSquareTexture(textureID textureid, int x, int y, int w, int h){
+void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang){
     glBindTexture(GL_TEXTURE_2D, textureid);
+
+#define r(x, y) glVertex3i((x) * cos(ang) - (y) * sin(ang), (x) * sin(ang) + (y) * cos(ang), 0)
+
     glBegin(GL_QUADS);
-        glTexCoord2i(0, 0); glVertex3i(x, y, 0);
-        glTexCoord2i(1, 0); glVertex3i(x + w, y, 0);
-        glTexCoord2i(1, 1); glVertex3i(x + w, y + h, 0);
-        glTexCoord2i(0, 1); glVertex3i(x, y + h, 0);
+        glTexCoord2i(0, 0); r(x    , y    );
+        glTexCoord2i(1, 0); r(x + w, y    );
+        glTexCoord2i(1, 1); r(x + w, y + h);
+        glTexCoord2i(0, 1); r(x    , y + h);
     glEnd();
 }
 
-static int renderedEnts = 0;
+void renderSquareTexture(textureID textureid, int x, int y, int w, int h){
+    glBindTexture(GL_TEXTURE_2D, textureid);
+    glBegin(GL_QUADS);
+        glTexCoord2i(0, 0); glVertex3i(x    , y    , 0);
+        glTexCoord2i(1, 0); glVertex3i(x + w, y    , 0);
+        glTexCoord2i(1, 1); glVertex3i(x + w, y + h, 0);
+        glTexCoord2i(0, 1); glVertex3i(x    , y + h, 0);
+    glEnd();
+}
+
+static int renderedEnts = 0, renderedBullets = 0;
 static void renderWorld2D(struct graphics *g){
 
     int startx, starty, endx, endy;
@@ -169,16 +182,29 @@ static void renderWorld2D(struct graphics *g){
         }
     }
 
-    pent c = worldEntities.first;
+#define inRender(x, y, w, h) \
+        x > -w && x < g->width  + h && \
+        y > -w && y < g->height + h \
+
+    renderedBullets = 0;
+    for(pbull b = worldBullets; b != NULL; b = b->next){
+        int x = (int) b->x - cameraX, y = (int) b->y - cameraY;
+        struct bulletData par = bulletDatas[b->dataid];
+        if(inRender(x, y, par.w, par.h)){
+            //TODO use the new renderer
+            /*renderSquareTextureRot(par.texture, x - par.w/2, y - par.h/2, par.w, par.h, b->ang);*/
+            renderSquareTexture(par.texture, x - par.w/2, y - par.h/2, par.w, par.h);
+            renderedBullets++;
+        }
+    }
+
     renderedEnts = 0;
-    while(c != NULL){
+    for(pent c = worldEntities.first; c != NULL; c = c->next){
         int x = (int) c->x - cameraX, y = (int) c->y - cameraY;
-        if(x > -c->w && x < g->width  + c->w &&
-           y > -c->h && y < g->height + c->h){
-            renderSquareTexture(c->textureID, x - c->w/2, y - c->w/2, c->w, c->h);
+        if(inRender(x, y, c->w, c->h)){
+            renderSquareTexture(c->textureID, x - c->w/2, y - c->h/2, c->w, c->h);
             renderedEnts++;
         }
-        c = c->next;
     }
 }
 
@@ -199,7 +225,7 @@ static void renderStatusBar(struct graphics *g, framerate frameTime, framerate a
     sprintf(buf, "%i %i, %i mxy %i, %i rmxy", mouseState, mouseX, mouseY, rmx, rmy);
     renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
 
-    sprintf(buf, "E: %i", renderedEnts);
+    sprintf(buf, "E: %i B: %i T: %i", renderedEnts, renderedBullets, renderedBullets + renderedEnts);
     renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
 
 #ifdef DEBUGFONT
@@ -292,19 +318,19 @@ static void renderInterface(struct graphics *g){
         glColor3f(r, g, b); \
         renderTextJust(globalFont, tbuf, xr - tbu - xoffset, y + tbu, 2, JUSTIFY_RIGHT);
 
-        STDISPL("AGI", lp->stats.agi, .0, 1., .3);
-        STDISPR("MS", getEntityMovespeed(lp), .5, .5, .5);
+        STDISPL("AGI" , lp->stats.agi          , .0, 1., .3);
+        STDISPR("MS"  , getEntityMovespeed(lp) , .5, .5, .5);
         y += statsText;
 
-        STDISPL("VIT", lp->stats.vit, .8, .0, .0);
-        STDISPR("HP", getEntityMaxHealth(lp), .8, .0, .0);
+        STDISPL("VIT" , lp->stats.vit          , .8, .0, .0);
+        STDISPR("HP"  , getEntityMaxHealth(lp) , .8, .0, .0);
         y += statsText;
 
-        STDISPL("ABI", lp->stats.abi, .6, .0, 1.);
+        STDISPL("ABI" , lp->stats.abi          , .6, .0, 1.);
         STDISPR("POOL", getEntityMaxAbility(lp), .6, .0, 1.);
         y += statsText;
 
-        STDISPL("DEF", lp->stats.def, .7, .7, .7);
+        STDISPL("DEF" , lp->stats.def          , .7, .7, .7);
 
         ENDPANELW(tbu + bu + statsText); //END stats panel
 

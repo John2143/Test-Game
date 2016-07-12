@@ -4,15 +4,16 @@
 #include "entity.h" //pent
 #include "input.h"
 
-extern double cameraAng, cameraX, cameraY;
+extern position cameraX, cameraY;
+extern angle cameraAng;
 extern pent cameraFollowing;
 extern int cameraYOffset, cameraXOffset;
-extern double cameraZoom;
+extern angle cameraZoom;
 
 void cameraFollowEntity(pent e);
-void cameraMoveTo(double x, double y);
+void cameraMoveTo(position x, position y);
 void setCameraOffset(int x, int y);
-void setCameraZoom(double zoom);
+void setCameraZoom(angle zoom);
 
 void screenToWorld(int x, int y, int *relx, int *rely);
 void worldMousePosition(int *relx, int *rely);

@@ -67,16 +67,20 @@ static void controlEntity(framerate framems, framerate appTime){
             getEntityMovespeed(controlledEntity) * framems
         );
     }
-#define SHOTTIME 1000
-    if(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && appTime - lastShot < 100){
+
+    if(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && appTime - lastShot > .2){
         lastShot = appTime;
-        pent bullet = newEntity(2);
-        grantAI(bullet, AI_BULLET);
-        setEntityPos(bullet, controlledEntity->x, controlledEntity->y);
         int x, y;
         worldMousePosition(&x, &y);
-        bullet->facing = atan2(y - controlledEntity->y, x - controlledEntity->x) + PI/2;
-        spawnEntity(bullet);
+
+
+        angle a = atan2(
+            y - controlledEntity->y,
+            x - controlledEntity->x
+        );
+        createBullet(0, appTime, controlledEntity, a);
+        createBullet(0, appTime, controlledEntity, a + .1);
+        createBullet(0, appTime, controlledEntity, a - .1);
     }
 }
 
@@ -89,7 +93,7 @@ static void tickAI(framerate framems, framerate appTime){
 switch(c->ai->currentMethod){
 case AI_NONE: break;
 case AI_WANDER: {
-    c->facing += (-1 + ((double) (rand() % 16) * .5)) * framems;
+    c->facing += (-1 + ((angle) (rand() % 16) * .5)) * framems;
     moveEntityAng(c,
         c->facing,
         getEntityMovespeed(c) * framems
@@ -106,12 +110,6 @@ case AI_CHASE: {
         getEntityMovespeed(c) * framems
     );
 } break;
-case AI_BULLET: {
-    moveEntityAng(c,
-        c->facing,
-        getEntityMovespeed(c) * framems
-    );
-} break;
 }
 
         }
@@ -122,6 +120,7 @@ case AI_BULLET: {
 void gameUpdate(framerate framems, framerate appTime){
     if(controlledEntity != NULL) controlEntity(framems, appTime);
     tickAI(framems, appTime);
+    tickBullets(framems, appTime);
 }
 
 void initLogic(){

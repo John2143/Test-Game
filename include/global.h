@@ -2,8 +2,13 @@
 #define global_H
 
 #include <GL/GLU.h>
+#include <stdint.h>
 
 typedef double framerate;
+
+typedef double position;
+typedef float angle;
+typedef uint32_t uid;
 
 typedef GLuint textureID;
 extern textureID loadTexture(const char *name); //Defined in graphics.c

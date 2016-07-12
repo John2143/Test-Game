@@ -6,6 +6,7 @@
 #include "input.h" //isKeyDown
 #include "entity.h" //pent and entity movement
 #include "camera.h" //cameraAng changes
+#include "bullet.h"
 
 void gameUpdate(framerate framems, framerate appTime);
 void initLogic();

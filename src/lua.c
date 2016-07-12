@@ -44,8 +44,8 @@ static int luaUnspawnEntity(lua_State *L){
 
 static int luaMoveEntity(lua_State *L){
     pent e = lua_touserdata(L, 1);
-    double x = luaL_checknumber(L, 1);
-    double y = luaL_checknumber(L, 1);
+    position x = luaL_checknumber(L, 1);
+    position y = luaL_checknumber(L, 1);
     moveEntity(e, x, y);
     lua_pushvalue(L, 1);
     return 1;
@@ -53,8 +53,8 @@ static int luaMoveEntity(lua_State *L){
 
 static int luaSetEntityPos(lua_State *L){
     pent e = lua_touserdata(L, 1);
-    double x = luaL_checknumber(L, 2);
-    double y = luaL_checknumber(L, 3);
+    position x = luaL_checknumber(L, 2);
+    position y = luaL_checknumber(L, 3);
     setEntityPos(e, x, y);
     lua_pushvalue(L, 1);
     return 1;

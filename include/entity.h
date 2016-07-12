@@ -5,7 +5,6 @@
 #include <stdlib.h> //malloc etc
 
 #include "global.h" //asset folder
-GLuint loadTexture(const char *name);
 
 struct stats{
     int def, agi, vit, abi;
@@ -15,7 +14,6 @@ enum AI{
     AI_NONE,
     AI_WANDER,
     AI_CHASE,
-    AI_BULLET,
 };
 
 struct AIData{
@@ -30,15 +28,15 @@ struct entityData{
 };
 
 typedef struct entity{
-    int globalid;
-    int parentid;
+    uid globalid;
+    uid parentid;
 
     GLuint textureID;
     //size_t textureOffset;
 
-    double x, y;
+    position x, y;
     int w, h;
-    double facing;
+    angle facing;
     int hp, abi;
     struct stats stats; //Customs stats: modified at spawn time
 
@@ -59,15 +57,17 @@ extern struct worldLinkedList worldEntities;
 void spawnEntity(pent e);
 void unspawnEntity(pent e);
 
-pent newEntity(int parentid);
-pent newEntityShell(int parentid, pent e);
+pent newEntity(uid parentid);
+pent newEntityShell(uid parentid, pent e);
 void deleteEntity(pent e);
-void moveEntity(pent e, double x, double y);
-void setEntityPos(pent e, double x, double y);
-void moveEntityAng(pent e, double ang, double del);
+void moveEntity(pent e, position x, position y);
+void setEntityPos(pent e, position x, position y);
+void moveEntityAng(pent e, angle ang, double del);
 void killEntity(pent e);
 
 void setEntityHealth(pent e, int hp);
+void changeEntityHealth(pent e, int hp); //nl
+void hurtEntity(pent e, int hp); //nl
 void setEntityAbility(pent e, int abi); //nl
 
 int getEntityMovespeed(pent e);
@@ -78,11 +78,14 @@ void setEntitySize(pent e, int scale);
 void embiggenEntity(pent e);
 const char *getName(pent e);
 
-pent findClosestEntity(pent to, int type);
+pent findClosestEntity(pent to, uid type);
 
 void grantAI(pent e, enum AI method);
 
 void loadEntities();
 void unloadEntities();
+
+extern pent controlledEntity;
+extern void setControlledEntity(pent e);
 
 #endif

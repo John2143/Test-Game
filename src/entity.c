@@ -10,16 +10,17 @@ static struct entityData *defaultEntites;
 void spawnEntity(pent e){
     e->last = NULL;
     e->next = worldEntities.first;
+    if(worldEntities.first) worldEntities.first->last = e;
     worldEntities.first = e;
 }
 
 void unspawnEntity(pent e){
     if(e->last) e->last->next = e->next;
     if(e->next) e->next->last = e->last;
-    return; //entity not found
+    if(worldEntities.first == e) worldEntities.first = e->next;
 }
 
-pent newEntityShell(int parentid, pent e){
+pent newEntityShell(uid parentid, pent e){
     e->globalid = currentEntityID++;
     e->parentid = parentid;
 
@@ -37,7 +38,7 @@ pent newEntityShell(int parentid, pent e){
     return e;
 }
 
-pent newEntity(int parentid){
+pent newEntity(uid parentid){
     return newEntityShell(parentid, malloc(sizeof(struct entity)));
 }
 
@@ -45,28 +46,40 @@ void deleteEntity(pent e){
     free(e);
 }
 
-void moveEntity(pent e, double x, double y){
+void moveEntity(pent e, position x, position y){
     e->x += x;
     e->y += y;
 }
 
-void setEntityPos(pent e, double x, double y){
+void setEntityPos(pent e, position x, position y){
     e->x = x;
     e->y = y;
 }
 
-void moveEntityAng(pent e, double ang, double del){
+void moveEntityAng(pent e, angle ang, double del){
     e->x += sin(ang) * del;
     e->y -= cos(ang) * del;
 }
 
 void killEntity(pent e){
-    setEntityHealth(e, 0);
     unspawnEntity(e);
+    if(e == controlledEntity) setControlledEntity(NULL);
 }
 
 void setEntityHealth(pent e, int hp){
     e->hp = hp;
+    if(hp <= 0){
+        killEntity(e);
+        //deleteEntity(e); ?????
+    }
+}
+
+void changeEntityHealth(pent e, int hp){
+    setEntityHealth(e, e->hp + hp);
+}
+
+void hurtEntity(pent e, int hp){
+    changeEntityHealth(e, -hp);
 }
 
 void setEntityAbility(pent e, int abi){
@@ -111,7 +124,7 @@ int getEntityMaxAbility(pent e){
     return e->stats.abi * 5;
 }
 
-pent findClosestEntity(pent to, int type){
+pent findClosestEntity(pent to, uid type){
     pent c = worldEntities.first;
     while(c != NULL){
         if(c != to && type == c->parentid) return c;

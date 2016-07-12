@@ -30,6 +30,7 @@ static unsigned long clockDivisor;
 #include "lua.h"
 #include "map.h"
 #include "tile.h"
+#include "bullet.h"
 
 static void getClockTime(clockType *val){
 #ifdef WIN32
@@ -82,6 +83,7 @@ int main(int argc, char** argv) {
     loadEntities();
     loadTileTextures();
     initializeWorld();
+    initializeBullets();
     luaStart();
 
     getClockTime(&gameStart);
@@ -116,6 +118,7 @@ int main(int argc, char** argv) {
 CLEANUP:
 
     luaEnd();
+    uninitializeBullets();
     uninitializeWorld();
     unloadTileTextures();
     unloadEntities();
