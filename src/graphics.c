@@ -137,8 +137,15 @@ void destroyGraphics(struct graphics *g){
 
 void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang){
     glBindTexture(GL_TEXTURE_2D, textureid);
+    ang = ang + PI/2;
 
-#define r(x, y) glVertex3i((x) * cos(ang) - (y) * sin(ang), (x) * sin(ang) + (y) * cos(ang), 0)
+#define xm (x + w/2)
+#define ym (y + h/2)
+
+#define r(x, y) glVertex3i( \
+    ((x - xm) * cos(ang) - (y - ym) * sin(ang)) + xm, \
+    ((x - xm) * sin(ang) + (y - ym) * cos(ang)) + ym, \
+    0)
 
     glBegin(GL_QUADS);
         glTexCoord2i(0, 0); r(x    , y    );
@@ -192,8 +199,8 @@ static void renderWorld2D(struct graphics *g){
         struct bulletData par = bulletDatas[b->dataid];
         if(inRender(x, y, par.w, par.h)){
             //TODO use the new renderer
-            /*renderSquareTextureRot(par.texture, x - par.w/2, y - par.h/2, par.w, par.h, b->ang);*/
-            renderSquareTexture(par.texture, x - par.w/2, y - par.h/2, par.w, par.h);
+            renderSquareTextureRot(par.texture, x - par.w/2, y - par.h/2, par.w, par.h, b->ang);
+            /*renderSquareTexture(par.texture, x - par.w/2, y - par.h/2, par.w, par.h);*/
             renderedBullets++;
         }
     }
