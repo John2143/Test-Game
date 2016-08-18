@@ -68,19 +68,17 @@ static void controlEntity(framerate framems, framerate appTime){
         );
     }
 
-    if(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && appTime - lastShot > .2){
+    if(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && appTime - lastShot > 1){
         lastShot = appTime;
         int x, y;
         worldMousePosition(&x, &y);
-
 
         angle a = atan2(
             y - controlledEntity->y,
             x - controlledEntity->x
         );
+
         createBullet(0, appTime, controlledEntity, a);
-        createBullet(0, appTime, controlledEntity, a + .1);
-        createBullet(0, appTime, controlledEntity, a - .1);
     }
 }
 

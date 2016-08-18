@@ -4,20 +4,20 @@
 static unsigned long clockDivisor;
 
 #ifdef WIN32
-#	include <Windows.h>
-#	define thread DWORD
-#	define newThread(f, arg, id) CreateThread(NULL, 0, f, arg, 0, id)
-#	define threadRType DWORD WINAPI
-#	define threadExit() return 0;
-#	define clockType LARGE_INTEGER
+#    include <Windows.h>
+#    define thread DWORD
+#    define newThread(f, arg, id) CreateThread(NULL, 0, f, arg, 0, id)
+#    define threadRType DWORD WINAPI
+#    define threadExit() return 0;
+#    define clockType LARGE_INTEGER
 #else
-#	include <pthread.h>
-#	include <time.h>
-#	define thread pthread
-#	define newThread(f, arg, id) pthread_create(id, NULL, f, arg)
-#	define threadRType void*
-#	define threadExit() pthread_exit(NULL);
-#	define clockType int
+#    include <pthread.h>
+#    include <time.h>
+#    define thread pthread
+#    define newThread(f, arg, id) pthread_create(id, NULL, f, arg)
+#    define threadRType void*
+#    define threadExit() pthread_exit(NULL);
+#    define clockType int
 #endif
 
 #include <SDL2/SDL.h>
@@ -34,52 +34,52 @@ static unsigned long clockDivisor;
 
 static void getClockTime(clockType *val){
 #ifdef WIN32
-	QueryPerformanceCounter(val);
+    QueryPerformanceCounter(val);
 #else
-	*val = clock();
+    *val = clock();
 #endif
 }
 
 static framerate getDiffClock(clockType a, clockType b){
 #ifdef WIN32
-	long diff = b.QuadPart - a.QuadPart;
-	return diff / (double) clockDivisor;
+    long diff = b.QuadPart - a.QuadPart;
+    return diff / (double) clockDivisor;
 #else
-	return (b - a) / (double) clockDivisor;
+    return (b - a) / (double) clockDivisor;
 #endif
 }
 
 int main(int argc, char** argv) {
-	(void) argc;
-	(void) argv;
-    srand(time(NULL));
+    (void) argc;
+    (void) argv;
+    /*srand(time(NULL));*/
 #ifdef WIN32
-	{
-		LARGE_INTEGER divisor;
-		QueryPerformanceFrequency(&divisor);
-		clockDivisor = divisor.QuadPart;
-	}
+    {
+        LARGE_INTEGER divisor;
+        QueryPerformanceFrequency(&divisor);
+        clockDivisor = divisor.QuadPart;
+    }
 #else
-	clockDivisor = CLOCKS_PER_SEC;
+    clockDivisor = CLOCKS_PER_SEC;
 #endif
-	printf("Starting\nClock divisor: %lu\n", clockDivisor);
-	SDL_Event event;
+    printf("Starting\nClock divisor: %lu\n", clockDivisor);
+    SDL_Event event;
 
-	struct graphics g = {
+    struct graphics g = {
         .width = 1200,
         .height = 900,
     };
-	initiateGraphics(&g, "Test window");
+    initiateGraphics(&g, "Test window");
 
-	if(!g.window) goto CLEANUP;
-	/*thread t;*/
-	/*newThread(test, NULL, &t);*/
+    if(!g.window) goto CLEANUP;
+    /*thread t;*/
+    /*newThread(test, NULL, &t);*/
 
-	clockType frameStart, frameEnd, gameStart;
-	framerate frameTime = 0, appTime = 0;
-	getClockTime(&frameStart);
+    clockType frameStart, frameEnd, gameStart;
+    framerate frameTime = 0, appTime = 0;
+    getClockTime(&frameStart);
 
-	initLogic();
+    initLogic();
     loadEntities();
     loadTileTextures();
     initializeWorld();
@@ -88,33 +88,33 @@ int main(int argc, char** argv) {
 
     getClockTime(&gameStart);
 
-	while(1){
+    while(1){
         cameraTick(frameTime, appTime);
-		renderGraphics(&g, frameTime, appTime);
+        renderGraphics(&g, frameTime, appTime);
 
         oldMouseState = mouseState;
         mouseState = SDL_GetMouseState(&mouseX, &mouseY);
         if(oldMouseState != mouseState){
             mouseEvent();
         }
-		if(SDL_PollEvent(&event)){
-			switch(event.type){
-			case SDL_QUIT:
-				goto CLEANUP;
-			case SDL_KEYDOWN:
-			case SDL_KEYUP:
+        if(SDL_PollEvent(&event)){
+            switch(event.type){
+            case SDL_QUIT:
+                goto CLEANUP;
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
                 if(event.key.keysym.scancode == 0x14) goto CLEANUP; //TODO
                 keyEvent(event.key);
             break;
-			}
-		}
+            }
+        }
 
-		getClockTime(&frameEnd);
-		frameTime = getDiffClock(frameStart, frameEnd);
+        getClockTime(&frameEnd);
+        frameTime = getDiffClock(frameStart, frameEnd);
         appTime = getDiffClock(gameStart, frameEnd);
-		frameStart = frameEnd;
+        frameStart = frameEnd;
         gameUpdate(frameTime, appTime);
-	}
+    }
 CLEANUP:
 
     luaEnd();
@@ -122,7 +122,7 @@ CLEANUP:
     uninitializeWorld();
     unloadTileTextures();
     unloadEntities();
-	destroyGraphics(&g);
+    destroyGraphics(&g);
 
-	return 0;
+    return 0;
 }

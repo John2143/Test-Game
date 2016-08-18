@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "global.h"
 #include "entity.h"
@@ -23,7 +24,11 @@ struct bulletData{
 
 typedef struct bullet{
     uid globalid;
-    pent owner;
+
+    uid *nocollide;
+    int nocollideAmount;
+    int nocollideAmountMax;
+
     position x, y;
     angle ang;
     framerate ctime;
@@ -43,5 +48,8 @@ void initializeBullets();
 void uninitializeBullets();
 
 void tickBullets(framerate framems, framerate appTime);
+bool bulletHitboxTouching(pent e, pbull b);
+void addNoCollideEntToBullet(uid id, pbull b);
+bool shouldBulletAndEntCollide(pent e, pbull b);
 
 #endif

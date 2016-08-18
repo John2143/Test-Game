@@ -198,9 +198,7 @@ static void renderWorld2D(struct graphics *g){
         int x = (int) b->x - cameraX, y = (int) b->y - cameraY;
         struct bulletData par = bulletDatas[b->dataid];
         if(inRender(x, y, par.w, par.h)){
-            //TODO use the new renderer
             renderSquareTextureRot(par.texture, x - par.w/2, y - par.h/2, par.w, par.h, b->ang);
-            /*renderSquareTexture(par.texture, x - par.w/2, y - par.h/2, par.w, par.h);*/
             renderedBullets++;
         }
     }

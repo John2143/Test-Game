@@ -8,10 +8,10 @@ player = newEntity(0)
 
 enemies = {}
 for i = 1, 100 do
-	enemies[i] = newEntity(1)
-		:grantAI(1) --AI_WANDER
+    enemies[i] = newEntity(1)
+        :grantAI(1) --AI_WANDER
         :setPos(300, 500)
-		:spawn()
+        :spawn()
 end
 
 table.insert(enemies, newEntity(1):grantAI(2):spawn()) --AI_CHASE
@@ -26,13 +26,13 @@ enemies[101]:unspawn()
 -- setControlledEntity(player);
 
 -- for(int i = 0; i < 100; i++){
-	-- pent e = newEntity(1);
-	-- grantAI(e, AI_WANDER);
-	-- spawnEntity(e);
+    -- pent e = newEntity(1);
+    -- grantAI(e, AI_WANDER);
+    -- spawnEntity(e);
 -- }
 
 -- for(int i = 0; i < 1; i++){
-	-- pent e = newEntity(1);
-	-- grantAI(e, AI_WANDER);
-	-- spawnEntity(e);
+    -- pent e = newEntity(1);
+    -- grantAI(e, AI_WANDER);
+    -- spawnEntity(e);
 -- }
