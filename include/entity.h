@@ -1,9 +1,6 @@
 #ifndef entity_H
 #define entity_H
 
-#include <math.h> //sin, cos
-#include <stdlib.h> //malloc etc
-
 #include "global.h" //asset folder
 
 struct stats{

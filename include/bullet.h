@@ -1,10 +1,6 @@
 #ifndef bullet_H
 #define bullet_H
 
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
-
 #include "global.h"
 #include "entity.h"
 

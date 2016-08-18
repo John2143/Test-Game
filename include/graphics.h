@@ -1,10 +1,7 @@
 #ifndef graphics_H
 #define graphics_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <GL/GLU.h>
-#include <stdio.h>
+#include "global.h"
 
 #include "entity.h"
 #include "camera.h"

@@ -1,11 +1,8 @@
 #ifndef map_H
 #define map_H
 
-#include <string.h>
-#include <math.h>
-
-#include "tile.h"
 #include "global.h"
+#include "tile.h"
 
 #define WORLDSIZE 100
 #define CLAMPWORLD(val) (MIN(MAX(val, 0), WORLDSIZE))

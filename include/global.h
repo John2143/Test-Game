@@ -1,8 +1,7 @@
 #ifndef global_H
 #define global_H
 
-#include <GL/GLU.h>
-#include <stdint.h>
+#include "stl.h"
 
 typedef double framerate;
 
@@ -22,6 +21,5 @@ extern textureID loadTexture(const char *name); //Defined in graphics.c
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 typedef enum {false, true} bool;
-typedef unsigned char uchar;
 
 #endif

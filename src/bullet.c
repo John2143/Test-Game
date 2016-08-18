@@ -73,7 +73,6 @@ void addNoCollideEntToBullet(uid id, pbull b){
     b->nocollide[b->nocollideAmount++] = id;
     if(b->nocollideAmount >= b->nocollideAmountMax){
         b->nocollideAmountMax = b->nocollideAmountMax * 2;
-            printf("Adding more mem\n");
         b->nocollide = realloc(b->nocollide, b->nocollideAmountMax * sizeof(uid));
         if(!b->nocollide){
             printf("Out of memory @ addCollideEntToBullet\n");

@@ -22,13 +22,13 @@ static const double movementDirectionAngles[] = {
     (7*PI)/4, (5*PI)/4,
 };
 
-#define KP_UP    isKeyPressed(0x52)
-#define KP_DOWN  isKeyPressed(0x51)
-#define KP_LEFT  isKeyPressed(0x50)
-#define KP_RIGHT isKeyPressed(0x4F)
+#define KP_UP    (isKeyPressed(0x52) || isKeyPressed(0x1A))
+#define KP_DOWN  (isKeyPressed(0x51) || isKeyPressed(0x16))
+#define KP_LEFT  (isKeyPressed(0x50) || isKeyPressed(0x04))
+#define KP_RIGHT (isKeyPressed(0x4F) || isKeyPressed(0x07))
 
-#define KP_ROR isKeyPressed(0x1B)
-#define KP_ROL isKeyPressed(0x1D)
+#define KP_ROR   isKeyPressed(0x1B)
+#define KP_ROL   isKeyPressed(0x1D)
 
 static framerate lastShot = 0;
 static void controlEntity(framerate framems, framerate appTime){

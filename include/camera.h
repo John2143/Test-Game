@@ -1,6 +1,7 @@
 #ifndef camera_H
 #define camera_H
 
+#include "global.h"
 #include "entity.h" //pent
 #include "input.h"
 

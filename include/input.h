@@ -1,11 +1,7 @@
 #ifndef input_H
 #define input_H
 
-#include <stdint.h>
-#include <SDL2/SDL.h>
-#ifdef DEBUG
-#	include <stdio.h>
-#endif
+#include "global.h"
 
 #define MAXKEYSDOWN 16
 
