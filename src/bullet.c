@@ -88,7 +88,7 @@ bool shouldBulletAndEntCollide(pent e, pbull b){
     return true;
 }
 
-void tickBullets(framerate framems, framerate appTime){
+void tickBullets(){
     bool dead;
     for(pbull e = worldBullets, next; e != NULL; e = next){
         dead = false;
@@ -116,8 +116,8 @@ void tickBullets(framerate framems, framerate appTime){
                 /*e->x  = cos(e->ang) * pdata.speed + e->owner->x;*/
                 /*e->y  = sin(e->ang) * pdata.speed + e->owner->y;*/
             }else{
-                e->x += cos(e->ang) * pdata.speed * framems;
-                e->y += sin(e->ang) * pdata.speed * framems;
+                e->x += cos(e->ang) * pdata.speed * frameTime;
+                e->y += sin(e->ang) * pdata.speed * frameTime;
             }
         }
 

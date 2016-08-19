@@ -1,7 +1,7 @@
 CC=gcc -std=c11
 CFLAGS=-Wall -Wextra -pedantic -Iinclude
 D=
-FILES=game.c graphics.c input.c logic.c entity.c lua.c camera.c tile.c map.c bullet.c
+FILES=game.c graphics.c input.c logic.c entity.c lua.c camera.c tile.c map.c bullet.c inventory.c
 SOURCES=$(addprefix src/, $(FILES))
 EXECUTABLE=game
 ifeq ($(shell uname),Linux)

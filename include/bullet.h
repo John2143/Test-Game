@@ -43,7 +43,7 @@ void removeBullet(pbull e);
 void initializeBullets();
 void uninitializeBullets();
 
-void tickBullets(framerate framems, framerate appTime);
+void tickBullets();
 bool bulletHitboxTouching(pent e, pbull b);
 void addNoCollideEntToBullet(uid id, pbull b);
 bool shouldBulletAndEntCollide(pent e, pbull b);

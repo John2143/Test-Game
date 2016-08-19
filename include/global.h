@@ -4,6 +4,7 @@
 #include "stl.h"
 
 typedef double framerate;
+extern framerate appTime, frameTime;
 
 typedef double position;
 typedef float angle;

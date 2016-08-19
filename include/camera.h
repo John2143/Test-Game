@@ -19,6 +19,6 @@ void setCameraZoom(angle zoom);
 void screenToWorld(int x, int y, int *relx, int *rely);
 void worldMousePosition(int *relx, int *rely);
 
-void cameraTick(framerate framems, framerate appTime);
+void cameraTick();
 
 #endif

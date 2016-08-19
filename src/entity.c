@@ -33,6 +33,8 @@ pent newEntityShell(uid parentid, pent e){
     setEntityHealth(e, getEntityMaxHealth(e));
     setEntityAbility(e, getEntityMaxAbility(e));
 
+    e->inventory = NULL;
+
     e->facing = 0;
     grantAI(e, AI_NONE);
     return e;

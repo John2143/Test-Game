@@ -2,6 +2,7 @@
 #define entity_H
 
 #include "global.h" //asset folder
+#include "inventory.h"
 
 struct stats{
     int def, agi, vit, abi;
@@ -39,6 +40,8 @@ typedef struct entity{
 
     struct AIData *ai;
     char *name;
+
+    struct inventory *inventory;
 
     struct entity *next;
     struct entity *last;

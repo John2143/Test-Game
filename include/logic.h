@@ -7,7 +7,7 @@
 #include "camera.h" //cameraAng changes
 #include "bullet.h"
 
-void gameUpdate(framerate framems, framerate appTime);
+void gameUpdate();
 void initLogic();
 
 void setControlledEntity(pent e);

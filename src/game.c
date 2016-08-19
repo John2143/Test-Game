@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 static unsigned long clockDivisor;
 
 #ifdef WIN32
@@ -20,8 +17,6 @@ static unsigned long clockDivisor;
 #    define clockType int
 #endif
 
-#include <SDL2/SDL.h>
-
 #include "global.h"
 #include "entity.h"
 #include "input.h"
@@ -31,6 +26,9 @@ static unsigned long clockDivisor;
 #include "map.h"
 #include "tile.h"
 #include "bullet.h"
+#include "inventory.h"
+
+framerate frameTime = 0, appTime = 0;
 
 static void getClockTime(clockType *val){
 #ifdef WIN32
@@ -76,7 +74,6 @@ int main(int argc, char** argv) {
     /*newThread(test, NULL, &t);*/
 
     clockType frameStart, frameEnd, gameStart;
-    framerate frameTime = 0, appTime = 0;
     getClockTime(&frameStart);
 
     initLogic();
@@ -84,12 +81,13 @@ int main(int argc, char** argv) {
     loadTileTextures();
     initializeWorld();
     initializeBullets();
+    initializeItems();
     luaStart();
 
     getClockTime(&gameStart);
 
     while(1){
-        cameraTick(frameTime, appTime);
+        cameraTick();
         renderGraphics(&g, frameTime, appTime);
 
         oldMouseState = mouseState;
@@ -113,11 +111,12 @@ int main(int argc, char** argv) {
         frameTime = getDiffClock(frameStart, frameEnd);
         appTime = getDiffClock(gameStart, frameEnd);
         frameStart = frameEnd;
-        gameUpdate(frameTime, appTime);
+        gameUpdate();
     }
 CLEANUP:
 
     luaEnd();
+    uninitializeItems();
     uninitializeBullets();
     uninitializeWorld();
     unloadTileTextures();

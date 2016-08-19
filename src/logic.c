@@ -31,7 +31,7 @@ static const double movementDirectionAngles[] = {
 #define KP_ROL   isKeyPressed(0x1D)
 
 static framerate lastShot = 0;
-static void controlEntity(framerate framems, framerate appTime){
+static void controlEntity(){
     enum movementDirection direction = MOVED_NONE;
     if(KP_UP){
         direction = MOVED_N;
@@ -55,16 +55,16 @@ static void controlEntity(framerate framems, framerate appTime){
     }
 
     if(KP_ROR && !KP_ROL){
-        cameraAng += framems * 20;
+        cameraAng += frameTime * 20;
     }
     if(KP_ROL && !KP_ROR){
-        cameraAng += framems * 20;
+        cameraAng += frameTime * 20;
     }
 
     if(direction != MOVED_NONE){
         moveEntityAng(controlledEntity,
             movementDirectionAngles[direction],
-            getEntityMovespeed(controlledEntity) * framems
+            getEntityMovespeed(controlledEntity) * frameTime
         );
     }
 
@@ -82,8 +82,7 @@ static void controlEntity(framerate framems, framerate appTime){
     }
 }
 
-static void tickAI(framerate framems, framerate appTime){
-    (void) appTime;
+static void tickAI(){
     pent c = worldEntities.first;
     while(c != NULL){
         if(c != controlledEntity && c->ai != NULL){
@@ -91,10 +90,10 @@ static void tickAI(framerate framems, framerate appTime){
 switch(c->ai->currentMethod){
 case AI_NONE: break;
 case AI_WANDER: {
-    c->facing += (-1 + ((angle) (rand() % 16) * .5)) * framems;
+    c->facing += (-1 + ((angle) (rand() % 16) * .5)) * frameTime;
     moveEntityAng(c,
         c->facing,
-        getEntityMovespeed(c) * framems
+        getEntityMovespeed(c) * frameTime
     );
 } break;
 case AI_CHASE: {
@@ -105,7 +104,7 @@ case AI_CHASE: {
 
     moveEntityAng(c,
         c->facing,
-        getEntityMovespeed(c) * framems
+        getEntityMovespeed(c) * frameTime
     );
 } break;
 }
@@ -115,10 +114,10 @@ case AI_CHASE: {
     }
 }
 
-void gameUpdate(framerate framems, framerate appTime){
-    if(controlledEntity != NULL) controlEntity(framems, appTime);
-    tickAI(framems, appTime);
-    tickBullets(framems, appTime);
+void gameUpdate(){
+    if(controlledEntity != NULL) controlEntity();
+    tickAI();
+    tickBullets();
 }
 
 void initLogic(){
