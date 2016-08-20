@@ -11,12 +11,6 @@ enum rarity{
     RARITY_UNIQUE,
 };
 
-struct itemData{
-    textureID texture;
-    int baseNumProps;
-    enum rarity baseRarity;
-};
-
 enum itemPropertyValueType{
     IPVT_DOUBLE,
     IPVT_INT64,
@@ -48,15 +42,25 @@ typedef struct item{
     struct itemProperty itemProperties[];
 } *pitem;
 
+typedef int (*testItemUseFunction)();
+
+struct itemData{
+    textureID texture;
+    int baseNumProps;
+    enum rarity baseRarity;
+    testItemUseFunction onUse;
+};
+
 struct inventory{
     uint8_t size;
     pitem items[];
 };
 
 enum invError{
-    INVE_SUCCESS,
-    INVE_NOSPACE,
-    INVE_NOINV,
+    INVE_NOSPACE = -1,
+    INVE_NOINV = -2,
+    INVE_BADSLOT = -3,
+    INVE_NOITEM = -4,
 };
 
 extern struct itemData *itemDatas;
@@ -65,6 +69,13 @@ extern struct itemPropertyData *itemPropertyDatas;
 void initializeItems();
 void uninitializeItems();
 
-enum invError giveItem(struct inventory *inv, pitem i);
+struct inventory *createInventory(int size);
+void freeInventory(struct inventory *i);
+pitem createRandomItem(uid itemid);
+void freeItem(pitem i);
+//returns slot # or error
+int giveItem(struct inventory *inv, pitem newitem);
+int moveItem(struct inventory *inv, int slot, int newslot);
+int useItem(struct inventory *inv, int slot);
 
 #endif

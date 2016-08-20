@@ -34,6 +34,13 @@ pent newEntityShell(uid parentid, pent e){
     setEntityAbility(e, getEntityMaxAbility(e));
 
     e->inventory = NULL;
+    //TODO
+    if(parentid == 0){
+        e->inventory = createInventory(12);
+                   giveItem(e->inventory, createRandomItem(0));
+        int slot = giveItem(e->inventory, createRandomItem(0));
+        moveItem(e->inventory, slot, 5);
+    }
 
     e->facing = 0;
     grantAI(e, AI_NONE);
@@ -45,7 +52,12 @@ pent newEntity(uid parentid){
 }
 
 void deleteEntity(pent e){
+    if(e->inventory) freeInventory(e->inventory);
     free(e);
+}
+
+int entityUseItem(pent e, int slot){
+    return useItem(e->inventory, slot);
 }
 
 void moveEntity(pent e, position x, position y){
@@ -103,11 +115,6 @@ void loadEntities(){
         .vit = 0, .def = 0, .agi = 0, .abi = 0
     };
 
-    defaultEntites[2].name = "bullet";
-    defaultEntites[2].textureID = loadTexture(assetFolderPath "bullet.png");
-    defaultEntites[2].stats = (struct stats) {
-        .vit = 0, .def = 0, .agi = 0, .abi = 0
-    };
 }
 
 void unloadEntities(){

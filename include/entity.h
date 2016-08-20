@@ -81,6 +81,7 @@ const char *getName(pent e);
 pent findClosestEntity(pent to, uid type);
 
 void grantAI(pent e, enum AI method);
+int entityUseItem(pent e, int slot);
 
 void loadEntities();
 void unloadEntities();

@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
 
     while(1){
         cameraTick();
-        renderGraphics(&g, frameTime, appTime);
+        renderGraphics(&g);
 
         oldMouseState = mouseState;
         mouseState = SDL_GetMouseState(&mouseX, &mouseY);

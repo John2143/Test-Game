@@ -9,6 +9,7 @@
 #include "map.h"
 #include "input.h"
 #include "bullet.h"
+#include "inventory.h"
 
 #define TILEPIXELS (4 * 8)
 
@@ -31,7 +32,7 @@ struct graphics{
 
 void initiateGraphics(struct graphics *g, const char* name);
 void destroyGraphics(struct graphics *g);
-void renderGraphics(struct graphics *g, framerate frameTime, framerate appTime);
+void renderGraphics(struct graphics *g);
 void setVSync(bool vsync);
 
 void renderSquareTexture   (textureID textureid, int x, int y, int w, int h);

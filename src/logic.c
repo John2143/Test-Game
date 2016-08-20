@@ -80,6 +80,18 @@ static void controlEntity(){
 
         createBullet(0, appTime, controlledEntity, a);
     }
+
+    static bool lastKeyState[5] = {0};
+    const int keyboard1 = 0x1e;
+    for(int i = 0; i < 5; i++){
+        bool pressed = isKeyPressed(i + keyboard1);
+        if(pressed != lastKeyState[i]){
+            if(pressed){
+                entityUseItem(controlledEntity, i);
+            }
+            lastKeyState[i] = pressed;
+        }
+    }
 }
 
 static void tickAI(){

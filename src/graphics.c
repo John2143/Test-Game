@@ -213,7 +213,7 @@ static void renderWorld2D(struct graphics *g){
     }
 }
 
-static void renderStatusBar(struct graphics *g, framerate frameTime, framerate appTime){
+static void renderStatusBar(struct graphics *g){
     glColor3f(1.0, 1.0, 1.0);
 
     char buf[128];
@@ -245,6 +245,7 @@ static void renderStatusBar(struct graphics *g, framerate frameTime, framerate a
 #endif
 }
 
+//Draws a square box with some texture
 #define glRectiWH(x, y, w, h) renderSquareTexture(areaTexture, x, y, w, h)
 /*#define glRectiWH(x, y, w, h) glRecti(x, y, (x) + (w), (y) + (h))*/
 
@@ -268,8 +269,10 @@ static void renderInterface(struct graphics *g){
     if((lp = cameraFollowing)){
 
         char tbuf[128];
+        //Buffer amount in pixels
         const int bu = 10;
         const int dbu = bu * 2;
+        //Text buffer amount in pixels
         const int tbu = 4;
         const int dtbu = tbu * 2;
         const int infoBoxWidth = 200;
@@ -339,10 +342,49 @@ static void renderInterface(struct graphics *g){
 
         ENDPANELW(tbu + bu + statsText); //END stats panel
 
+        if(lp->inventory){
+            const int sidebuff = 4;
+            const int dsidebuff = sidebuff * 2;
+            const int itemsize = 32;
+            const int itembuffer = 6;
+
+            struct inventory *inv = lp->inventory;
+            xoffset = bu;
+            bool incrementY = false;
+            for(int i = 0; i < inv->size; i++){
+                if(incrementY){
+                    y += 32 + itembuffer + dsidebuff;
+                    incrementY = false;
+                }
+                pitem it = inv->items[i];
+                PANELCOLOR;
+                glRectiWH(infoBoxX + xoffset, y, dsidebuff + itemsize, dsidebuff + itemsize);
+                WHITECOLOR;
+                if(it){
+                    struct itemData itd = itemDatas[it->itemid];
+                    renderSquareTexture(itd.texture, infoBoxX + xoffset + sidebuff, y + sidebuff, itemsize, itemsize);
+                }else{
+                    const char *const STEXT[] = {
+                        "1", "2", "3", "4", "5",
+                        /*"S1", "S2", "S3", "S4", "S5"*/
+                    };
+                    if(i < sizeof(STEXT)/sizeof(*STEXT)){
+                        renderTextJust(globalFont, STEXT[i],
+                            infoBoxX + xoffset + sidebuff + itemsize/2,
+                            y + sidebuff + 4, 3, JUSTIFY_CENTER);
+                    }
+                }
+                xoffset += itembuffer + itemsize + dsidebuff;
+                if(xoffset + bu + itemsize + dsidebuff > infoBoxWidth){
+                    xoffset = bu;
+                    incrementY = true;
+                }
+            }
+        }
     }
 }
 
-void renderGraphics(struct graphics *g, framerate frameTime, framerate appTime){
+void renderGraphics(struct graphics *g){
 #ifdef DEBUG
     glClear(GL_COLOR_BUFFER_BIT);
 #endif
@@ -352,7 +394,7 @@ void renderGraphics(struct graphics *g, framerate frameTime, framerate appTime){
 		glColor3f(1.0f, 1.0f, 1.0f);
         renderWorld2D(g);
 		renderInterface(g);
-        renderStatusBar(g, frameTime, appTime);
+        renderStatusBar(g);
 	glPopMatrix();
 
 	SDL_GL_SwapWindow(g->window);

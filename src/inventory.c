@@ -4,8 +4,17 @@ struct itemData *itemDatas;
 struct itemPropertyData *itemPropertyDatas;
 int64_t itemGlobalID = 0;
 
+int testFunctionForOnItemUse(){
+    printf("An item has been used\n");
+    return 0;
+}
+
 void initializeItems(){
     itemDatas = malloc(8 * sizeof(*itemDatas));
+    itemDatas[0].baseNumProps = 3;
+    itemDatas[0].baseRarity = RARITY_BASIC;
+    itemDatas[0].texture = loadTexture(assetFolderPath "brick.png");
+    itemDatas[0].onUse = testFunctionForOnItemUse;
 
     itemPropertyDatas = malloc(8 * sizeof(*itemPropertyDatas));
     itemPropertyDatas[0].formatStr = "+%i Primary Attribute";
@@ -59,13 +68,30 @@ void freeItem(pitem i){
     free(i);
 }
 
-enum invError giveItem(struct inventory *inv, pitem newitem){
+int giveItem(struct inventory *inv, pitem newitem){
     if(!inv) return INVE_NOINV;
     for(int i = 0; i < inv->size; i++){
         pitem item = inv->items[i];
         if(item) continue;
         inv->items[i] = newitem;
-        return INVE_SUCCESS;
+        return i;
     }
     return INVE_NOSPACE;
+}
+
+int moveItem(struct inventory *inv, int slot, int newslot){
+    if(!inv) return INVE_NOINV;
+    if(slot >= inv->size || slot < 0) return INVE_BADSLOT;
+    if(newslot >= inv->size || newslot < 0) return INVE_BADSLOT;
+
+    pitem it = inv->items[slot];
+    inv->items[slot] = inv->items[newslot];
+    inv->items[newslot] = it;
+    return 0;
+}
+
+int useItem(struct inventory *inv, int slot){
+    if(!inv) return INVE_NOINV;
+    if(!inv->items[slot]) return INVE_NOITEM;
+    return itemDatas[inv->items[slot]->itemid].onUse();
 }

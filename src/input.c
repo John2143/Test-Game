@@ -17,7 +17,7 @@ static int replaceFirst(uint32_t a, uint32_t b){
 #ifdef DEBUG
 static void printAll(){
 
-    if(1) return;
+    /*if(1) return;*/
 
 	for(int i = 0; i < MAXKEYSDOWN; i++){
 		if(keysdown[i]){
