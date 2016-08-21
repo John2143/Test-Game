@@ -366,7 +366,7 @@ static void renderInterface(struct graphics *g){
                 }else{
                     const char *const STEXT[] = {
                         "1", "2", "3", "4", "5",
-                        /*"S1", "S2", "S3", "S4", "S5"*/
+                        "S1", "S2", "S3", "S4", "S5"
                     };
                     if(i < sizeof(STEXT)/sizeof(*STEXT)){
                         renderTextJust(globalFont, STEXT[i],

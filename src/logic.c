@@ -87,7 +87,12 @@ static void controlEntity(){
         bool pressed = isKeyPressed(i + keyboard1);
         if(pressed != lastKeyState[i]){
             if(pressed){
-                entityUseItem(controlledEntity, i);
+                //shift
+                if(isKeyPressed(0xe1)){
+                    entityUseItem(controlledEntity, i + 5);
+                }else{
+                    entityUseItem(controlledEntity, i);
+                }
             }
             lastKeyState[i] = pressed;
         }

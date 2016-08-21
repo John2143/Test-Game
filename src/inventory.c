@@ -4,17 +4,12 @@ struct itemData *itemDatas;
 struct itemPropertyData *itemPropertyDatas;
 int64_t itemGlobalID = 0;
 
-int testFunctionForOnItemUse(){
-    printf("An item has been used\n");
-    return 0;
-}
-
 void initializeItems(){
     itemDatas = malloc(8 * sizeof(*itemDatas));
     itemDatas[0].baseNumProps = 3;
     itemDatas[0].baseRarity = RARITY_BASIC;
     itemDatas[0].texture = loadTexture(assetFolderPath "brick.png");
-    itemDatas[0].onUse = testFunctionForOnItemUse;
+    itemDatas[0].onUse = NULL;
 
     itemPropertyDatas = malloc(8 * sizeof(*itemPropertyDatas));
     itemPropertyDatas[0].formatStr = "+%i Primary Attribute";
@@ -88,10 +83,4 @@ int moveItem(struct inventory *inv, int slot, int newslot){
     inv->items[slot] = inv->items[newslot];
     inv->items[newslot] = it;
     return 0;
-}
-
-int useItem(struct inventory *inv, int slot){
-    if(!inv) return INVE_NOINV;
-    if(!inv->items[slot]) return INVE_NOITEM;
-    return itemDatas[inv->items[slot]->itemid].onUse();
 }

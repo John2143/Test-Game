@@ -27,6 +27,7 @@ static unsigned long clockDivisor;
 #include "tile.h"
 #include "bullet.h"
 #include "inventory.h"
+#include "itemFunctions.h"
 
 framerate frameTime = 0, appTime = 0;
 
@@ -82,6 +83,7 @@ int main(int argc, char** argv) {
     initializeWorld();
     initializeBullets();
     initializeItems();
+    initializeItemFunctions();
     luaStart();
 
     getClockTime(&gameStart);
@@ -117,6 +119,7 @@ CLEANUP:
 
     luaEnd();
     uninitializeItems();
+    uninitializeItemFunctions();
     uninitializeBullets();
     uninitializeWorld();
     unloadTileTextures();

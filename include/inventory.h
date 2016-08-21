@@ -42,13 +42,14 @@ typedef struct item{
     struct itemProperty itemProperties[];
 } *pitem;
 
-typedef int (*testItemUseFunction)();
+typedef struct entity *pent;
+typedef int (*itemUseFunction)(pent ent, pitem it);
 
 struct itemData{
     textureID texture;
     int baseNumProps;
     enum rarity baseRarity;
-    testItemUseFunction onUse;
+    itemUseFunction onUse;
 };
 
 struct inventory{
@@ -61,6 +62,7 @@ enum invError{
     INVE_NOINV = -2,
     INVE_BADSLOT = -3,
     INVE_NOITEM = -4,
+    INVE_NOFUNC = -5,
 };
 
 extern struct itemData *itemDatas;
@@ -76,6 +78,5 @@ void freeItem(pitem i);
 //returns slot # or error
 int giveItem(struct inventory *inv, pitem newitem);
 int moveItem(struct inventory *inv, int slot, int newslot);
-int useItem(struct inventory *inv, int slot);
 
 #endif

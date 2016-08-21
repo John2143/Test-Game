@@ -39,7 +39,7 @@ pent newEntityShell(uid parentid, pent e){
         e->inventory = createInventory(12);
                    giveItem(e->inventory, createRandomItem(0));
         int slot = giveItem(e->inventory, createRandomItem(0));
-        moveItem(e->inventory, slot, 5);
+        moveItem(e->inventory, slot, 7);
     }
 
     e->facing = 0;
@@ -57,7 +57,13 @@ void deleteEntity(pent e){
 }
 
 int entityUseItem(pent e, int slot){
-    return useItem(e->inventory, slot);
+    struct inventory *inv = e->inventory;
+    if(!inv) return INVE_NOINV;
+    pitem it = inv->items[slot];
+    if(!it) return INVE_NOITEM;
+    itemUseFunction iuf = itemDatas[it->itemid].onUse;
+    if(!iuf) return INVE_NOFUNC;
+    return iuf(e, it);
 }
 
 void moveEntity(pent e, position x, position y){
