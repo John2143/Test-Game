@@ -71,7 +71,6 @@ static void controlEntity(){
     if(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && appTime - lastShot > 1){
         lastShot = appTime;
         angle a = getLocalAimPosition(controlledEntity);
-
         createBullet(0, appTime, controlledEntity, a);
     }
 

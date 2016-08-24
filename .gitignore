@@ -3,3 +3,5 @@ game
 types_c.taghl
 tags
 test.*
+gprof.out
+gmon.out

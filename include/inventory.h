@@ -21,7 +21,6 @@ union itemPropertyValue{
     double d;
 };
 
-
 struct itemPropertyData{
     const char *formatStr;
     enum itemPropertyValueType valueType;
@@ -39,6 +38,7 @@ typedef struct item{
     uid itemid;
 
     int numprops;
+    framerate lastUse;
     struct itemProperty itemProperties[];
 } *pitem;
 
@@ -48,6 +48,7 @@ typedef int (*itemUseFunction)(pent ent, pitem it);
 struct itemData{
     textureID texture;
     int baseNumProps;
+    framerate cooldown;
     enum rarity baseRarity;
     itemUseFunction onUse;
 };

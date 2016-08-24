@@ -12,6 +12,7 @@
 #include "inventory.h"
 
 #define TILEPIXELS (4 * 8)
+#define KERNINGSIZE 128
 
 typedef GLuint fontID;
 struct font{

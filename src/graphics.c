@@ -70,12 +70,11 @@ struct font *loadFont(const char *name, int bits, int width){
         strcpy(buff, name);
         strcat(buff, ".kerning");
         FILE *fp = fopen(buff, "rb");
-        if(fp == NULL){
-            printf("Failed to load kerning\n");
-            free(newFont);
-            return NULL;
+        if(fp == NULL) goto FAILEDLOAD;
+        size_t readBytes = fread(newFont->kerning, 1, KERNINGSIZE, fp);
+        if(readBytes != KERNINGSIZE) goto FAILEDLOAD;
+        if(0){
         }
-        fread(newFont->kerning, 1, 128, fp);
         fclose(fp);
     }
 
@@ -100,6 +99,11 @@ struct font *loadFont(const char *name, int bits, int width){
 FINISH:
     SDL_FreeSurface(fullFont);
     return newFont;
+
+FAILEDLOAD:
+    printf("Failed to load kerning\n");
+    free(newFont);
+    return NULL;
 }
 
 textureID loadTexture(const char *name){
@@ -158,10 +162,10 @@ void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, ang
 void renderSquareTexture(textureID textureid, int x, int y, int w, int h){
     glBindTexture(GL_TEXTURE_2D, textureid);
     glBegin(GL_QUADS);
-        glTexCoord2i(0, 0); glVertex3i(x    , y    , 0);
-        glTexCoord2i(1, 0); glVertex3i(x + w, y    , 0);
-        glTexCoord2i(1, 1); glVertex3i(x + w, y + h, 0);
-        glTexCoord2i(0, 1); glVertex3i(x    , y + h, 0);
+        glTexCoord2i(0, 0); glVertex2i(x    , y    );
+        glTexCoord2i(1, 0); glVertex2i(x + w, y    );
+        glTexCoord2i(1, 1); glVertex2i(x + w, y + h);
+        glTexCoord2i(0, 1); glVertex2i(x    , y + h);
     glEnd();
 }
 
@@ -213,14 +217,34 @@ static void renderWorld2D(struct graphics *g){
     }
 }
 
+//This should be a power of two less than 256
+#define NUMFRAMERATES 32
 static void renderStatusBar(struct graphics *g){
+    static framerate frameRates[NUMFRAMERATES];
+    static uint8_t curFramerate = 0;
+    static bool hasInitializedFramerates = false;
+    frameRates[curFramerate++ % NUMFRAMERATES] = frameTime;
+    if(!hasInitializedFramerates && curFramerate > NUMFRAMERATES) hasInitializedFramerates = true;
+
+    framerate normalizedFPS = 0, normalizedFrametime = 0;
+    if(hasInitializedFramerates){
+        for(int i = 0; i < NUMFRAMERATES; i++){
+            normalizedFPS += MIN(1/frameRates[i], 1000);
+            normalizedFrametime += frameRates[i];
+        }
+        normalizedFrametime /= NUMFRAMERATES;
+        normalizedFPS /= NUMFRAMERATES;
+    }
+
     glColor3f(1.0, 1.0, 1.0);
 
     char buf[128];
     int y = 0;
     framerate fps = MIN(1/frameTime, 1000);
-    sprintf(buf, "%.2fs %.4f spf %.0f FPS", appTime, frameTime, fps);
+    sprintf(buf, "%.2fs %.4f nspf %.0f NFPS", appTime, normalizedFrametime, normalizedFPS);
     renderTextJust(globalMonoFont, buf, g->width, 0, 4, JUSTIFY_RIGHT);
+    sprintf(buf, "%.4f spf %.0f FPS", frameTime, fps);
+    renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
     if(cameraFollowing){
         sprintf(buf, "%.1f, %.1f pxy", cameraFollowing->x, cameraFollowing->y);
         renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
@@ -351,7 +375,7 @@ static void renderInterface(struct graphics *g){
             struct inventory *inv = lp->inventory;
             xoffset = bu;
             bool incrementY = false;
-            for(int i = 0; i < inv->size; i++){
+            for(unsigned int i = 0; i < inv->size; i++){
                 if(incrementY){
                     y += 32 + itembuffer + dsidebuff;
                     incrementY = false;
@@ -366,7 +390,8 @@ static void renderInterface(struct graphics *g){
                 }else{
                     const char *const STEXT[] = {
                         "1", "2", "3", "4", "5",
-                        "S1", "S2", "S3", "S4", "S5"
+                        "S1", "S2", "S3", "S4", "S5",
+                        /*"SP", "M1", "M2"*/
                     };
                     if(i < sizeof(STEXT)/sizeof(*STEXT)){
                         renderTextJust(globalFont, STEXT[i],
