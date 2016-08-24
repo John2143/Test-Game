@@ -48,11 +48,7 @@ typedef struct entity{
 } *pent;
 //I normally don't typdef structs, but I have a feeling struct entity * will be used a lot.
 
-struct worldLinkedList{
-    pent first;
-};
-
-extern struct worldLinkedList worldEntities;
+extern pent worldEntities;
 
 void spawnEntity(pent e);
 void unspawnEntity(pent e);

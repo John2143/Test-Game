@@ -11,6 +11,7 @@ extern Uint32 mouseState, oldMouseState;
 void mouseEvent();
 void keyEvent(SDL_KeyboardEvent key);
 int isKeyPressed(uint32_t code);
+extern void logicOnKeyPress(uint32_t code);
 
 extern uint32_t keysdown[MAXKEYSDOWN];
 

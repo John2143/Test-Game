@@ -22,5 +22,7 @@ extern textureID loadTexture(const char *name); //Defined in graphics.c
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 typedef enum {false, true} bool;
+extern float normalRandomFloat();
+extern float randomFloat(float a, float b);
 
 #endif

@@ -18,6 +18,7 @@ void setCameraZoom(angle zoom);
 
 void screenToWorld(int x, int y, int *relx, int *rely);
 void worldMousePosition(int *relx, int *rely);
+angle getLocalAimPosition(pent e);
 
 void cameraTick();
 

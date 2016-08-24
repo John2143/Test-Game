@@ -70,37 +70,28 @@ static void controlEntity(){
 
     if(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && appTime - lastShot > 1){
         lastShot = appTime;
-        int x, y;
-        worldMousePosition(&x, &y);
-
-        angle a = atan2(
-            y - controlledEntity->y,
-            x - controlledEntity->x
-        );
+        angle a = getLocalAimPosition(controlledEntity);
 
         createBullet(0, appTime, controlledEntity, a);
     }
 
-    static bool lastKeyState[5] = {0};
+}
+
+void logicOnKeyPress(uint32_t code){
     const int keyboard1 = 0x1e;
-    for(int i = 0; i < 5; i++){
-        bool pressed = isKeyPressed(i + keyboard1);
-        if(pressed != lastKeyState[i]){
-            if(pressed){
-                //shift
-                if(isKeyPressed(0xe1)){
-                    entityUseItem(controlledEntity, i + 5);
-                }else{
-                    entityUseItem(controlledEntity, i);
-                }
-            }
-            lastKeyState[i] = pressed;
+    bool shiftPressed = isKeyPressed(0xe1);
+    int keyVal = code - keyboard1;
+    if(keyVal < 5 && keyVal >= 0){
+        if(shiftPressed){
+            entityUseItem(controlledEntity, keyVal + 5);
+        }else{
+            entityUseItem(controlledEntity, keyVal);
         }
     }
 }
 
 static void tickAI(){
-    pent c = worldEntities.first;
+    pent c = worldEntities;
     while(c != NULL){
         if(c != controlledEntity && c->ai != NULL){
 

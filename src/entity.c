@@ -1,23 +1,21 @@
 #include <entity.h>
 
 static unsigned int currentEntityID = 0;
-struct worldLinkedList worldEntities = {
-    .first = NULL,
-};
+pent worldEntities = NULL;
 
 static struct entityData *defaultEntites;
 
 void spawnEntity(pent e){
     e->last = NULL;
-    e->next = worldEntities.first;
-    if(worldEntities.first) worldEntities.first->last = e;
-    worldEntities.first = e;
+    e->next = worldEntities;
+    if(worldEntities) worldEntities->last = e;
+    worldEntities = e;
 }
 
 void unspawnEntity(pent e){
     if(e->last) e->last->next = e->next;
     if(e->next) e->next->last = e->last;
-    if(worldEntities.first == e) worldEntities.first = e->next;
+    if(worldEntities == e) worldEntities = e->next;
 }
 
 pent newEntityShell(uid parentid, pent e){
@@ -140,7 +138,7 @@ int getEntityMaxAbility(pent e){
 }
 
 pent findClosestEntity(pent to, uid type){
-    pent c = worldEntities.first;
+    pent c = worldEntities;
     while(c != NULL){
         if(c != to && type == c->parentid) return c;
         c = c->next;

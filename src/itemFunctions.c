@@ -2,17 +2,13 @@
 
 int IFShotgun(pent e, pitem it){
     (void) (it);
-    int x, y;
-    worldMousePosition(&x, &y);
 
-    angle a = atan2(
-        y - e->y,
-        x - e->x
-    );
+    angle a = getLocalAimPosition(e);
 
     createBullet(0, appTime, e, a);
     createBullet(0, appTime, e, a - .15);
     createBullet(0, appTime, e, a + .15);
+
     return 0;
 }
 

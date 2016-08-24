@@ -37,6 +37,7 @@ void keyEvent(SDL_KeyboardEvent key){
 
 	if(state){
 		replaceFirst(0, code);
+        logicOnKeyPress(code);
 	}else{
 		replaceFirst(code, 0);
 	}

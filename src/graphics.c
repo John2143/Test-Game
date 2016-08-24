@@ -181,7 +181,7 @@ static void renderWorld2D(struct graphics *g){
     for(int x = startx; x < endx; x++){
         for(int y = starty; y < endy; y++){
             renderSquareTexture(
-                globalTileArray[gameworld[x][y]].texture,
+                tileDatas[gameworld[x][y]].texture,
                 x * TILEPIXELS - cameraX,
                 y * TILEPIXELS - cameraY,
                 TILEPIXELS, TILEPIXELS
@@ -204,7 +204,7 @@ static void renderWorld2D(struct graphics *g){
     }
 
     renderedEnts = 0;
-    for(pent c = worldEntities.first; c != NULL; c = c->next){
+    for(pent c = worldEntities; c != NULL; c = c->next){
         int x = (int) c->x - cameraX, y = (int) c->y - cameraY;
         if(inRender(x, y, c->w, c->h)){
             renderSquareTexture(c->textureID, x - c->w/2, y - c->h/2, c->w, c->h);

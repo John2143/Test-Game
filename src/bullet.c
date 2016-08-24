@@ -94,7 +94,7 @@ void tickBullets(){
         dead = false;
         struct bulletData pdata = bulletDatas[e->dataid];
         //TODO O(n^2) = bad
-        for(pent ent = worldEntities.first; ent != NULL; ent = ent->next){
+        for(pent ent = worldEntities; ent != NULL; ent = ent->next){
             if(!shouldBulletAndEntCollide(ent, e)) continue;
             if(bulletHitboxTouching(ent, e)){
                 /*printf("Doing %i damage to ent %i (hp %i)\n", pdata.damage, ent->globalid, ent->hp);*/

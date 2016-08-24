@@ -128,3 +128,12 @@ CLEANUP:
 
     return 0;
 }
+
+float normalRandomFloat(){
+    return ((float) rand()) / ((float) RAND_MAX);
+}
+
+float randomFloat(float a, float b){
+    float diff = b - a;
+    return a + normalRandomFloat() * diff;
+}

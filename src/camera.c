@@ -30,7 +30,14 @@ void screenToWorld(int x, int y, int *relx, int *rely){
     if(relx) *relx = (cameraX + x);
     if(rely) *rely = (cameraY + y);
 }
-
 void worldMousePosition(int *relx, int *rely){
     screenToWorld(mouseX, mouseY, relx, rely);
+}
+angle getLocalAimPosition(pent e){
+    int x, y;
+    worldMousePosition(&x, &y);
+    return atan2(
+        y - e->y,
+        x - e->x
+    );
 }

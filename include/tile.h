@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-extern struct tile *globalTileArray;
+extern struct tile *tileDatas;
 
 typedef unsigned char tileid;
 struct tile{
