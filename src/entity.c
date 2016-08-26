@@ -59,9 +59,17 @@ int entityUseItem(pent e, int slot){
     if(!inv) return INVE_NOINV;
     pitem it = inv->items[slot];
     if(!it) return INVE_NOITEM;
-    itemUseFunction iuf = itemDatas[it->itemid].onUse;
+    struct itemData idat = itemDatas[it->itemid];
+    if(e->abi < idat.abiCost) return INVE_NOABI;
+    if(appTime - it->lastUse < idat.cooldown) return INVE_ONCOOLDOWN;
+    itemUseFunction iuf = idat.onUse;
     if(!iuf) return INVE_NOFUNC;
-    return iuf(e, it);
+    int ret = iuf(e, it);
+    if(ret != INVE_DONTCOOLDOWN){
+        e->abi -= idat.abiCost;
+        it->lastUse = appTime;
+    }
+    return 0;
 }
 
 void moveEntity(pent e, position x, position y){

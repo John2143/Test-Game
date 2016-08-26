@@ -84,7 +84,11 @@ void logicOnKeyPress(uint32_t code){
         if(shiftPressed){
             entityUseItem(controlledEntity, keyVal + 5);
         }else{
-            entityUseItem(controlledEntity, keyVal);
+            int e = entityUseItem(controlledEntity, keyVal);
+            if(e == INVE_ONCOOLDOWN){
+                printf("Item on cooldown... (%fs)\n",
+                    appTime - controlledEntity->inventory->items[keyVal]->lastUse);
+            }
         }
     }
 }

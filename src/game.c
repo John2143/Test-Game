@@ -62,7 +62,6 @@ int main(int argc, char** argv) {
     clockDivisor = CLOCKS_PER_SEC;
 #endif
     printf("Starting\nClock divisor: %lu\n", clockDivisor);
-    SDL_Event event;
 
     struct graphics g = {
         .width = 1200,
@@ -97,7 +96,7 @@ int main(int argc, char** argv) {
         if(oldMouseState != mouseState){
             mouseEvent();
         }
-        if(SDL_PollEvent(&event)){
+        for(SDL_Event event; SDL_PollEvent(&event);){
             switch(event.type){
             case SDL_QUIT:
                 goto CLEANUP;

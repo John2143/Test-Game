@@ -9,6 +9,8 @@ void initializeItems(){
     itemDatas[0].baseNumProps = 3;
     itemDatas[0].baseRarity = RARITY_BASIC;
     itemDatas[0].texture = loadTexture(assetFolderPath "brick.png");
+    itemDatas[0].cooldown = 1.0;
+    itemDatas[0].abiCost = 10;
     itemDatas[0].onUse = NULL;
 
     itemPropertyDatas = malloc(8 * sizeof(*itemPropertyDatas));
@@ -16,6 +18,11 @@ void initializeItems(){
     itemPropertyDatas[0].valueType = IPVT_INT64;
     itemPropertyDatas[0].valueMin.i = 10;
     itemPropertyDatas[0].valueMax.i = 20;
+
+    itemPropertyDatas[1].formatStr = "Cooldown reduced by %%%i";
+    itemPropertyDatas[1].valueType = IPVT_INT64;
+    itemPropertyDatas[1].valueMin.i = 5;
+    itemPropertyDatas[1].valueMax.i = 10;
 }
 
 void uninitializeItems(){
@@ -53,6 +60,7 @@ pitem createRandomItem(uid itemid){
     pitem item = malloc(sizeof(*item) + numprops * sizeof(struct itemProperty));
     item->globalid = itemGlobalID++;
     item->itemid = itemid;
+    item->lastUse = 0;
     for(int i = 0; i < numprops; i++){
         randomProperty(&item->itemProperties[i]);
     }

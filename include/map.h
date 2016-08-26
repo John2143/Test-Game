@@ -4,7 +4,7 @@
 #include "global.h"
 #include "tile.h"
 
-#define WORLDSIZE 100
+#define WORLDSIZE 2
 #define CLAMPWORLD(val) (MIN(MAX(val, 0), WORLDSIZE))
 
 extern tileid gameworld[WORLDSIZE][WORLDSIZE];

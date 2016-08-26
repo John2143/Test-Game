@@ -36,7 +36,6 @@ struct itemProperty{
 typedef struct item{
     int64_t globalid;
     uid itemid;
-
     int numprops;
     framerate lastUse;
     struct itemProperty itemProperties[];
@@ -51,6 +50,7 @@ struct itemData{
     framerate cooldown;
     enum rarity baseRarity;
     itemUseFunction onUse;
+    int abiCost;
 };
 
 struct inventory{
@@ -64,6 +64,9 @@ enum invError{
     INVE_BADSLOT = -3,
     INVE_NOITEM = -4,
     INVE_NOFUNC = -5,
+    INVE_DONTCOOLDOWN = -6,
+    INVE_ONCOOLDOWN = -7,
+    INVE_NOABI = -8,
 };
 
 extern struct itemData *itemDatas;
