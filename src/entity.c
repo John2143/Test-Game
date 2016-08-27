@@ -35,9 +35,9 @@ pent newEntityShell(uid parentid, pent e){
     //TODO
     if(parentid == 0){
         e->inventory = createInventory(12);
-                   giveItem(e->inventory, createRandomItem(0));
+                   giveItem(e->inventory, createRandomItem(1));
         int slot = giveItem(e->inventory, createRandomItem(0));
-        moveItem(e->inventory, slot, 7);
+        moveItem(e->inventory, slot, 4);
     }
 
     e->facing = 0;

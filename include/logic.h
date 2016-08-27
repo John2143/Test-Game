@@ -11,6 +11,8 @@
 void gameUpdate();
 void initLogic();
 
+void logicUseItem(int slot);
+void logicOnKeyPress(uint32_t code);
 void setControlledEntity(pent e);
 extern pent controlledEntity;
 

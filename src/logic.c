@@ -30,7 +30,6 @@ static const double movementDirectionAngles[] = {
 #define KP_ROR   isKeyPressed(0x1B)
 #define KP_ROL   isKeyPressed(0x1D)
 
-static framerate lastShot = 0;
 static void controlEntity(){
     enum movementDirection direction = MOVED_NONE;
     if(KP_UP){
@@ -68,28 +67,34 @@ static void controlEntity(){
         );
     }
 
-    if(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) && appTime - lastShot > 1){
-        lastShot = appTime;
-        angle a = getLocalAimPosition(controlledEntity);
-        createBullet(0, appTime, controlledEntity, a);
+    if(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)){
+        logicUseItem(0);
+    }
+    if(mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT)){
+        logicUseItem(1);
     }
 
+}
+
+/*static*/
+void logicUseItem(int slot){
+    entityUseItem(controlledEntity, slot);
 }
 
 void logicOnKeyPress(uint32_t code){
     const int keyboard1 = 0x1e;
     bool shiftPressed = isKeyPressed(0xe1);
     int keyVal = code - keyboard1;
-    if(keyVal < 5 && keyVal >= 0){
+    const int numberKeyOffset = 3;
+    const int numNumberKeys = 5;
+    if(keyVal < numNumberKeys && keyVal >= 0){
         if(shiftPressed){
-            entityUseItem(controlledEntity, keyVal + 5);
+            logicUseItem(keyVal + numNumberKeys + numberKeyOffset);
         }else{
-            int e = entityUseItem(controlledEntity, keyVal);
-            if(e == INVE_ONCOOLDOWN){
-                printf("Item on cooldown... (%fs)\n",
-                    appTime - controlledEntity->inventory->items[keyVal]->lastUse);
-            }
+            logicUseItem(keyVal + numberKeyOffset);
         }
+    }else if(code == 0x2c){
+        logicUseItem(2);
     }
 }
 

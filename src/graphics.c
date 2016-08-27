@@ -389,9 +389,9 @@ static void renderInterface(struct graphics *g){
                     renderSquareTexture(itd.texture, infoBoxX + xoffset + sidebuff, y + sidebuff, itemsize, itemsize);
                 }else{
                     const char *const STEXT[] = {
+                        "M1", "M2", "SP",
                         "1", "2", "3", "4", "5",
                         "S1", "S2", "S3", "S4", "S5",
-                        /*"SP", "M1", "M2"*/
                     };
                     if(i < sizeof(STEXT)/sizeof(*STEXT)){
                         renderTextJust(globalFont, STEXT[i],

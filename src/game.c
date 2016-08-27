@@ -64,8 +64,12 @@ int main(int argc, char** argv) {
     printf("Starting\nClock divisor: %lu\n", clockDivisor);
 
     struct graphics g = {
+#ifdef SHOWKEYS
+        .width = 100, .height = 100,
+#else
         .width = 1200,
         .height = 900,
+#endif
     };
     initiateGraphics(&g, "Test window");
 

@@ -1,6 +1,6 @@
 #include "itemFunctions.h"
 
-int IFShotgun(pent e, pitem it){
+static int IFShotgun(pent e, pitem it){
     (void) (it);
 
     angle a = getLocalAimPosition(e);
@@ -12,8 +12,15 @@ int IFShotgun(pent e, pitem it){
     return 0;
 }
 
+static int IFWand(pent e, pitem it){
+    angle a = getLocalAimPosition(e);
+    createBullet(0, appTime, e, a);
+    return 0;
+}
+
 void initializeItemFunctions(){
     itemDatas[0].onUse = IFShotgun;
+    itemDatas[1].onUse = IFWand;
 }
 
 void uninitializeItemFunctions(){

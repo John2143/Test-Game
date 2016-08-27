@@ -11,7 +11,14 @@ void initializeItems(){
     itemDatas[0].texture = loadTexture(assetFolderPath "brick.png");
     itemDatas[0].cooldown = 1.0;
     itemDatas[0].abiCost = 10;
-    itemDatas[0].onUse = NULL;
+    /*itemDatas[0].onUse = NULL;*/
+
+    itemDatas[1].baseNumProps = 3;
+    itemDatas[1].baseRarity = RARITY_BASIC;
+    itemDatas[1].texture = loadTexture(assetFolderPath "water.png");
+    itemDatas[1].cooldown = .3;
+    itemDatas[1].abiCost = 0;
+    /*itemDatas[1].onUse = NULL;*/
 
     itemPropertyDatas = malloc(8 * sizeof(*itemPropertyDatas));
     itemPropertyDatas[0].formatStr = "+%i Primary Attribute";

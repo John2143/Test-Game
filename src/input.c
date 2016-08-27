@@ -14,11 +14,8 @@ static int replaceFirst(uint32_t a, uint32_t b){
 	return -1;
 }
 
-#ifdef DEBUG
 static void printAll(){
-
-    if(1) return;
-
+#ifdef SHOWKEYS
 	for(int i = 0; i < MAXKEYSDOWN; i++){
 		if(keysdown[i]){
 			printf("%.3x", keysdown[i]);
@@ -27,8 +24,8 @@ static void printAll(){
 		}
 	}
 	printf("\n");
-}
 #endif
+}
 
 void keyEvent(SDL_KeyboardEvent key){
 	if(key.repeat > 0) return;
@@ -41,9 +38,7 @@ void keyEvent(SDL_KeyboardEvent key){
 	}else{
 		replaceFirst(code, 0);
 	}
-#ifdef DEBUG
     printAll();
-#endif
 }
 
 void mouseEvent(){
