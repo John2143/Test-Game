@@ -1,20 +1,16 @@
 #include "itemFunctions.h"
 
 static int IFShotgun(pent e, pitem it){
-    (void) (it);
-
     angle a = getLocalAimPosition(e);
-
-    createBullet(0, appTime, e, a);
-    createBullet(0, appTime, e, a - .15);
-    createBullet(0, appTime, e, a + .15);
-
+    createItemBullet(0, appTime, e, it, a);
+    createItemBullet(0, appTime, e, it, a - .15);
+    createItemBullet(0, appTime, e, it, a + .15);
     return 0;
 }
 
 static int IFWand(pent e, pitem it){
     angle a = getLocalAimPosition(e);
-    createBullet(0, appTime, e, a);
+    createItemBullet(0, appTime, e, it, a);
     return 0;
 }
 

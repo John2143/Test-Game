@@ -98,10 +98,9 @@ void logicOnKeyPress(uint32_t code){
     }
 }
 
-static void tickAI(){
-    pent c = worldEntities;
-    while(c != NULL){
-        if(c != controlledEntity && c->ai != NULL){
+static void tickAI(pent c){
+    //TODO implement in lua
+    if(c != controlledEntity && c->ai != NULL){
 
 switch(c->ai->currentMethod){
 case AI_NONE: break;
@@ -125,15 +124,24 @@ case AI_CHASE: {
 } break;
 }
 
-        }
-        c = c->next;
     }
+}
+
+static void tickEntity(pent c){
+    stattype maxAbi = getEntityMaxAbility(c);
+    stattype maxHP  = getEntityMaxHealth(c);
+    if(c->abi < maxAbi) c->abi = MIN(maxAbi, c->abi + frameTime * getEntityRegenAbility(c));
+    if(c->hp < maxHP)  c->hp  = MIN(maxHP,  c->hp  + frameTime * getEntityRegenHealth(c));
 }
 
 void gameUpdate(){
     if(controlledEntity != NULL) controlEntity();
-    tickAI();
     tickBullets();
+
+    for(pent c = worldEntities; c != NULL; c = c->next){
+        tickEntity(c);
+        tickAI(c);
+    }
 }
 
 void initLogic(){

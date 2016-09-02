@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "entity.h"
+#include "inventory.h"
 
 enum bulletFlags{
     BFLAG_PIERCE = 1 << 0,
@@ -25,6 +26,8 @@ typedef struct bullet{
     int nocollideAmount;
     int nocollideAmountMax;
 
+    int damage;
+
     position x, y;
     angle ang;
     framerate ctime;
@@ -37,7 +40,8 @@ typedef struct bullet{
 extern struct bulletData *bulletDatas;
 extern pbull worldBullets;
 
-pbull createBullet(uid dataid, framerate appTime, pent owner, angle ang);
+pbull createBullet    (uid dataid, framerate appTime, pent owner,           angle ang);
+pbull createItemBullet(uid dataid, framerate appTime, pent owner, pitem it, angle ang);
 void removeBullet(pbull e);
 
 void initializeBullets();

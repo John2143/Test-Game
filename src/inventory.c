@@ -10,6 +10,7 @@ void initializeItems(){
     itemDatas[0].baseRarity = RARITY_BASIC;
     itemDatas[0].texture = loadTexture(assetFolderPath "brick.png");
     itemDatas[0].cooldown = 1.0;
+    itemDatas[0].baseDamage = 5;
     itemDatas[0].abiCost = 10;
     /*itemDatas[0].onUse = NULL;*/
 
@@ -17,6 +18,7 @@ void initializeItems(){
     itemDatas[1].baseRarity = RARITY_BASIC;
     itemDatas[1].texture = loadTexture(assetFolderPath "water.png");
     itemDatas[1].cooldown = .3;
+    itemDatas[1].baseDamage = 5;
     itemDatas[1].abiCost = 0;
     /*itemDatas[1].onUse = NULL;*/
 
@@ -98,4 +100,11 @@ int moveItem(struct inventory *inv, int slot, int newslot){
     inv->items[slot] = inv->items[newslot];
     inv->items[newslot] = it;
     return 0;
+}
+
+struct itemProperty *getItemProperty(pitem it, uid propid){
+    for(int i = 0; i < it->numprops; i++){
+        if(propid == it->itemProperties[i].id) return &it->itemProperties[i];
+    }
+    return NULL;
 }

@@ -285,7 +285,7 @@ static void renderStatusBar(struct graphics *g){
 #define ENDPANEL() y += nexty + bu;
 #define ENDPANELW(a) y += a;
 
-#define BUFFERI(var) sprintf(tbuf, "%i", var);
+#define BUFFERI(var) sprintf(tbuf, "%i", (int) (var));
 
 static void renderInterface(struct graphics *g){
     (void) g;
@@ -312,7 +312,7 @@ static void renderInterface(struct graphics *g){
 
 #define DISBAR(amt, max, r, g, b) {\
         BASICPANEL(16 + dtbu); \
-        float pct = (float) (amt) / (float) (max); \
+        float pct = (amt) / (max); \
         glColor3f(r, g, b); \
         glRectiWH(infoBoxX + bu, y, (int)((infoBoxWidth - dbu) * pct), 16 + dtbu); \
         glColor3f(1., 1., 1.); \
@@ -331,10 +331,6 @@ static void renderInterface(struct graphics *g){
         }
 
         //Start stats panel
-        int statsText = (16 + tbu);
-        BASICPANEL(statsText * 4 + tbu);
-
-        int xoffset = 0;
 
 #define STDISPL(name, variable, r, g, b) \
         BUFFERI(variable); \
@@ -350,19 +346,23 @@ static void renderInterface(struct graphics *g){
         glColor3f(r, g, b); \
         renderTextJust(globalFont, tbuf, xr - tbu - xoffset, y + tbu, 2, JUSTIFY_RIGHT);
 
-        STDISPL("AGI" , lp->stats.agi          , .0, 1., .3);
-        STDISPR("MS"  , getEntityMovespeed(lp) , .5, .5, .5);
-        y += statsText;
+        int statsText = (16 + tbu);
+        int xoffset = 0;
+        BASICPANEL(statsText * 4 + tbu);
 
-        STDISPL("VIT" , lp->stats.vit          , .8, .0, .0);
-        STDISPR("HP"  , getEntityMaxHealth(lp) , .8, .0, .0);
-        y += statsText;
+            STDISPL("AGI" , lp->stats.agi                , .0, 1., .3);
+            STDISPR("MS"  , getEntityMovespeed(lp)       , .5, .5, .5);
+            y += statsText;
 
-        STDISPL("ABI" , lp->stats.abi          , .6, .0, 1.);
-        STDISPR("POOL", getEntityMaxAbility(lp), .6, .0, 1.);
-        y += statsText;
+            STDISPL("VIT" , lp->stats.vit                , .8, .0, .0);
+            STDISPR("HP"  , (int) getEntityMaxHealth(lp) , .8, .0, .0);
+            y += statsText;
 
-        STDISPL("DEF" , lp->stats.def          , .7, .7, .7);
+            STDISPL("ABI" , (int) lp->stats.abi          , .6, .0, 1.);
+            STDISPR("POOL", (int) getEntityMaxAbility(lp), .6, .0, 1.);
+            y += statsText;
+
+            STDISPL("DEF" , lp->stats.def          , .7, .7, .7);
 
         ENDPANELW(tbu + bu + statsText); //END stats panel
 
@@ -393,7 +393,7 @@ static void renderInterface(struct graphics *g){
                         "1", "2", "3", "4", "5",
                         "S1", "S2", "S3", "S4", "S5",
                     };
-                    if(i < sizeof(STEXT)/sizeof(*STEXT)){
+                    if(i < STRUCTARRAYLEN(STEXT)){
                         renderTextJust(globalFont, STEXT[i],
                             infoBoxX + xoffset + sidebuff + itemsize/2,
                             y + sidebuff + 4, 3, JUSTIFY_CENTER);

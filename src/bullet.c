@@ -6,6 +6,7 @@ pbull worldBullets = NULL;
 int currentBulletID = 0;
 pbull createBullet(uid dataid, framerate appTime, pent owner, angle ang){
     pbull e = malloc(sizeof(*e));
+    struct bulletData bdat = bulletDatas[dataid];
 
     e->globalid = currentBulletID++;
     e->dataid = dataid;
@@ -24,11 +25,19 @@ pbull createBullet(uid dataid, framerate appTime, pent owner, angle ang){
     e->y = owner->y;
     e->ang = ang;
 
+    e->damage = bdat.damage;
+
     e->last = NULL;
     e->next = worldBullets;
     if(worldBullets) worldBullets->last = e;
     worldBullets = e;
 
+    return e;
+}
+
+pbull createItemBullet(uid dataid, framerate appTime, pent owner, pitem it, angle ang){
+    pbull e = createBullet(dataid, appTime, owner, ang);
+    e->damage += itemDatas[it->itemid].baseDamage;
     return e;
 }
 
@@ -97,8 +106,8 @@ void tickBullets(){
         for(pent ent = worldEntities; ent != NULL; ent = ent->next){
             if(!shouldBulletAndEntCollide(ent, e)) continue;
             if(bulletHitboxTouching(ent, e)){
-                /*printf("Doing %i damage to ent %i (hp %i)\n", pdata.damage, ent->globalid, ent->hp);*/
-                hurtEntity(ent, pdata.damage);
+                /*printf("Doing %i damage to ent %i (hp %i)\n", e->damage, ent->globalid, ent->hp);*/
+                hurtEntity(ent, e->damage);
                 if(pdata.flags & BFLAG_PIERCE){
                     addNoCollideEntToBullet(ent->globalid, e);
                 }else{
@@ -129,5 +138,9 @@ void tickBullets(){
 }
 
 void uninitializeBullets(){
-    //TODO free as linked list
+    for(pbull b = worldBullets; b != NULL;){
+        pbull next = b->next;
+        free(b);
+        b = next;
+    }
 }

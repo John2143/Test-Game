@@ -29,7 +29,7 @@ struct itemPropertyData{
 };
 
 struct itemProperty{
-    int id;
+    uid id;
     union itemPropertyValue value;
 };
 
@@ -49,6 +49,7 @@ struct itemData{
     int baseNumProps;
     framerate cooldown;
     enum rarity baseRarity;
+    int baseDamage;
     itemUseFunction onUse;
     int abiCost;
 };
@@ -82,5 +83,6 @@ void freeItem(pitem i);
 //returns slot # or error
 int giveItem(struct inventory *inv, pitem newitem);
 int moveItem(struct inventory *inv, int slot, int newslot);
+struct itemProperty *getItemProperty(pitem it, uid propid);
 
 #endif

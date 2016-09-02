@@ -140,3 +140,24 @@ float randomFloat(float a, float b){
     float diff = b - a;
     return a + normalRandomFloat() * diff;
 }
+
+#define safePutChar(buf, c) \
+    *buf++ = c; if(++printsize == buflength) goto terminateBuf;
+
+size_t gsprintf(char *buf, size_t buflength, const char *fmt, ...){
+    va_list vargs;
+    size_t printsize = 1; //Include null
+    va_start(vargs, fmt);
+    for(; *fmt != '\0'; fmt++){
+        if(*fmt != '%'){
+            safePutChar(buf, *fmt);
+            continue;
+        }
+        switch(*fmt){
+        }
+    }
+terminateBuf:
+    *buf = '\0';
+    va_end(vargs);
+    return printsize;
+}

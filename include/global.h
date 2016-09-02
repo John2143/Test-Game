@@ -4,6 +4,7 @@
 #include "stl.h"
 
 typedef double framerate;
+typedef double stattype;
 extern framerate appTime, frameTime;
 
 typedef double position;
@@ -20,6 +21,11 @@ extern textureID loadTexture(const char *name); //Defined in graphics.c
 #define assetFolderPath assetFolder "/"
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define STRUCTARRAYLEN(arr) (sizeof(arr)/sizeof(*arr))
+
+#define GSPR_NONE (1 << 32 - 1)
+size_t gsprintf(char *buf, size_t buflength, const char *fmt, ...);
+#define gprintf(buf, ...) gsprintf(buf, GSPR_NONE, ...)
 
 typedef enum {false, true} bool;
 extern float normalRandomFloat();

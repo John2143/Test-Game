@@ -137,12 +137,21 @@ int getEntityMovespeed(pent e){
     return e->stats.agi * 2 + 200;
 }
 
-int getEntityMaxHealth(pent e){
+stattype getEntityMaxHealth(pent e){
     return e->stats.vit * 10 + 10;
 }
 
-int getEntityMaxAbility(pent e){
+stattype getEntityMaxAbility(pent e){
     return e->stats.abi * 5;
+}
+
+//Amount per second = max / (seconds to fully regen)
+stattype getEntityRegenHealth(pent e){
+    return getEntityMaxHealth(e) / 60;
+}
+
+stattype getEntityRegenAbility(pent e){
+    return getEntityMaxAbility(e) / 15;
 }
 
 pent findClosestEntity(pent to, uid type){

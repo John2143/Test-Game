@@ -5,6 +5,7 @@
 #include "inventory.h"
 
 struct stats{
+    //These should not be of type 'stattype'
     int def, agi, vit, abi;
 };
 
@@ -35,7 +36,7 @@ typedef struct entity{
     position x, y;
     int w, h;
     angle facing;
-    int hp, abi;
+    stattype hp, abi;
     struct stats stats; //Customs stats: modified at spawn time
 
     struct AIData *ai;
@@ -46,7 +47,9 @@ typedef struct entity{
     struct entity *next;
     struct entity *last;
 } *pent;
+
 //I normally don't typdef structs, but I have a feeling struct entity * will be used a lot.
+//TODO nl = not implement in lua
 
 extern pent worldEntities;
 
@@ -67,8 +70,12 @@ void hurtEntity(pent e, int hp); //nl
 void setEntityAbility(pent e, int abi); //nl
 
 int getEntityMovespeed(pent e);
-int getEntityMaxHealth(pent e); //NL
-int getEntityMaxAbility(pent e); //NL
+stattype getEntityMaxHealth(pent e); //NL
+stattype getEntityMaxAbility(pent e); //NL
+
+//Returns regen per second
+stattype getEntityRegenHealth(pent e); //NL
+stattype getEntityRegenAbility(pent e); //NL
 
 void setEntitySize(pent e, int scale);
 void embiggenEntity(pent e);
