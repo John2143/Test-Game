@@ -81,6 +81,32 @@ void logicUseItem(int slot){
     entityUseItem(controlledEntity, slot);
 }
 
+void tickWallCheck(pent e){
+    int x = e->x;
+    int y = e->y;
+    int w2 = e->w/2;
+    int h2 = e->h/2;
+    int tileX = x/TILESIZE;
+    int tileY = y/TILESIZE;
+    if(tileX < 1 || tileY < 1 ||
+       tileY >= WORLDSIZE - 1 || tileX >= WORLDSIZE - 1)
+        return;
+    if(tileDatas[gameworld[tileX - 1][tileY]].isSolid){
+        if(x - tileX*TILESIZE < w2) e->x = w2 + tileX*TILESIZE;
+    }
+    if(tileDatas[gameworld[tileX + 1][tileY]].isSolid){
+        //HACKY: TILESIZE = PLAYER SIZE:::: CHANGE IN RELEASE
+        if(x - tileX*TILESIZE > w2) e->x = w2 + tileX*TILESIZE;
+    }
+    if(tileDatas[gameworld[tileX][tileY - 1]].isSolid){
+        if(y - tileY*TILESIZE < h2) e->y = h2 + tileY*TILESIZE;
+    }
+    if(tileDatas[gameworld[tileX][tileY + 1]].isSolid){
+        //HACKY: TILESIZE = PLAYER SIZE:::: CHANGE IN RELEASE
+        if(y - tileY*TILESIZE > h2) e->y = h2 + tileY*TILESIZE;
+    }
+}
+
 void logicOnKeyPress(uint32_t code){
     const int keyboard1 = 0x1e;
     bool shiftPressed = isKeyPressed(0xe1);
@@ -141,6 +167,7 @@ void gameUpdate(){
     for(pent c = worldEntities; c != NULL; c = c->next){
         tickEntity(c);
         tickAI(c);
+        tickWallCheck(c);
     }
 }
 

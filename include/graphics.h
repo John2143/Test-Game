@@ -11,7 +11,7 @@
 #include "bullet.h"
 #include "inventory.h"
 
-#define TILEPIXELS (4 * 8)
+#define TILEPIXELS TILESIZE
 #define KERNINGSIZE 128
 
 typedef GLuint fontID;

@@ -7,6 +7,8 @@
 #include "camera.h" //cameraAng changes
 #include "inventory.h"
 #include "bullet.h"
+#include "tile.h"
+#include "map.h"
 
 void gameUpdate();
 void initLogic();

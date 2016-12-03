@@ -118,7 +118,7 @@ void loadEntities(){
     defaultEntites[0].name = "Player";
     defaultEntites[0].textureID = loadTexture(assetFolderPath "player.png");
     defaultEntites[0].stats = (struct stats) {
-        .vit = 10, .def = 5, .agi = 500, .abi = 5
+        .vit = 10, .def = 5, .agi = 50, .abi = 5
     };
 
     defaultEntites[1].name = "testname";
