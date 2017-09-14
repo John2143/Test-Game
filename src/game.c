@@ -51,7 +51,7 @@ static framerate getDiffClock(clockType a, clockType b){
 int main(int argc, char** argv) {
     (void) argc;
     (void) argv;
-    /*srand(time(NULL));*/
+    srand(time(NULL));
 #ifdef WIN32
     {
         LARGE_INTEGER divisor;
