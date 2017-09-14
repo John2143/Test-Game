@@ -6,7 +6,8 @@ void luaStart(){
     lua_State *L = globalLuaState = luaL_newstate();
     luaL_openlibs(L);
 
-
+    Luna<Entity_L>::Register(L);
+    //Luna<Map_L>::Register(L);
 
     if(luaL_dofile(L, "lua/start.lua")){
         printf("Failed to start lua: %s\n", lua_tostring(L, -1));

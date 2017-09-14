@@ -2,7 +2,7 @@
 #define bullet_H
 
 #include "global.h"
-#include "entity.h"
+#include "entity.hpp"
 #include "inventory.h"
 
 enum bulletFlags{
@@ -40,16 +40,16 @@ typedef struct bullet{
 extern struct bulletData *bulletDatas;
 extern pbull worldBullets;
 
-pbull createBullet    (uid dataid, framerate appTime, pent owner,           angle ang);
-pbull createItemBullet(uid dataid, framerate appTime, pent owner, pitem it, angle ang);
+pbull createBullet    (uid dataid, framerate appTime, Entity &owner,           angle ang);
+pbull createItemBullet(uid dataid, framerate appTime, Entity &owner, pitem it, angle ang);
 void removeBullet(pbull e);
 
 void initializeBullets();
 void uninitializeBullets();
 
 void tickBullets();
-bool bulletHitboxTouching(pent e, pbull b);
+bool bulletHitboxTouching(Entity &e, pbull b);
 void addNoCollideEntToBullet(uid id, pbull b);
-bool shouldBulletAndEntCollide(pent e, pbull b);
+bool shouldBulletAndEntCollide(Entity &e, pbull b);
 
 #endif

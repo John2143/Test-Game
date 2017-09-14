@@ -208,10 +208,10 @@ static void renderWorld2D(struct graphics *g){
     }
 
     renderedEnts = 0;
-    for(pent c = worldEntities; c != NULL; c = c->next){
-        int x = (int) c->x - cameraX, y = (int) c->y - cameraY;
-        if(inRender(x, y, c->w, c->h)){
-            renderSquareTexture(c->tid, x - c->w/2, y - c->h/2, c->w, c->h);
+    for(Entity c : worldEntities){
+        int x = (int) c.x - cameraX, y = (int) c.y - cameraY;
+        if(inRender(x, y, c.w, c.h)){
+            renderSquareTexture(c.tid, x - c.w/2, y - c.h/2, c.w, c.h);
             renderedEnts++;
         }
     }
@@ -289,7 +289,7 @@ static void renderStatusBar(struct graphics *g){
 
 static void renderInterface(struct graphics *g){
     (void) g;
-    pent lp;
+    Entity *lp;
     if((lp = cameraFollowing)){
 
         char tbuf[128];
@@ -324,9 +324,9 @@ static void renderInterface(struct graphics *g){
         }
 
 
-        DISBAR(lp->hp, getEntityMaxHealth(lp), .8, .0, .0);
+        DISBAR(lp->hp, lp->getMaxHealth(), .8, .0, .0);
         int amt;
-        if((amt = getEntityMaxAbility(lp))){
+        if((amt = lp->getMaxAbility())){
             DISBAR(lp->abi, amt, .6, .0, 1.);
         }
 
@@ -351,15 +351,15 @@ static void renderInterface(struct graphics *g){
         BASICPANEL(statsText * 4 + tbu);
 
             STDISPL("AGI" , lp->stats.agi                , .0, 1., .3);
-            STDISPR("MS"  , getEntityMovespeed(lp)       , .5, .5, .5);
+            STDISPR("MS"  , lp->getMovespeed()           , .5, .5, .5);
             y += statsText;
 
             STDISPL("VIT" , lp->stats.vit                , .8, .0, .0);
-            STDISPR("HP"  , (int) getEntityMaxHealth(lp) , .8, .0, .0);
+            STDISPR("HP"  , (int) lp->getMaxHealth()     , .8, .0, .0);
             y += statsText;
 
             STDISPL("ABI" , (int) lp->stats.abi          , .6, .0, 1.);
-            STDISPR("POOL", (int) getEntityMaxAbility(lp), .6, .0, 1.);
+            STDISPR("POOL", (int) lp->getMaxAbility()    , .6, .0, 1.);
             y += statsText;
 
             STDISPL("DEF" , lp->stats.def          , .7, .7, .7);

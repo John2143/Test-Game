@@ -3,7 +3,7 @@
 
 #include "global.h"
 #include "input.h" //isKeyDown
-#include "entity.h" //pent and entity movement
+#include "entity.hpp"
 #include "camera.h" //cameraAng changes
 #include "inventory.h"
 #include "bullet.h"
@@ -15,7 +15,7 @@ void initLogic();
 
 void logicUseItem(int slot);
 void logicOnKeyPress(uint32_t code);
-void setControlledEntity(pent e);
-extern pent controlledEntity;
+void setControlledEntity(Entity *e);
+extern Entity *controlledEntity;
 
 #endif

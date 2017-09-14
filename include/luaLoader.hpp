@@ -9,9 +9,9 @@
 #define luaLoader_H
 
 extern "C" {
-    #include <lua/lua.h>
-    #include <lua/lauxlib.h>
-    #include <lua/lualib.h>
+    #include "lua/lua.h"
+    #include "lua/lauxlib.h"
+    #include "lua/lualib.h"
 }
 
 template <class T> class Luna{
@@ -20,6 +20,30 @@ public:
         const char *name;
         int (T::*member_function)(lua_State *L);
     };
+
+    static void StackDump(lua_State* L){
+        int i;
+        int top = lua_gettop(L);
+        for (i = 1; i <= top; i++) {  /* repeat for each level */
+            int t = lua_type(L, i);
+            switch (t) {
+                case LUA_TSTRING:  /* strings */
+                    printf("`%s'", lua_tostring(L, i));
+                    break;
+                case LUA_TBOOLEAN:  /* booleans */
+                    printf(lua_toboolean(L, i) ? "true" : "false");
+                    break;
+                case LUA_TNUMBER:  /* numbers */
+                    printf("%g", lua_tonumber(L, i));
+                    break;
+                default:  /* other values */
+                    printf("%s", lua_typename(L, t));
+                    break;
+            }
+            printf("  ");  /* put a separator */
+        }
+        printf("\n");  /* end the listing */
+    }
 
     static void Register(lua_State* L) {
         //Register the keyword as a global function that returns the userdata
@@ -31,7 +55,7 @@ public:
         //prototype methods
         lua_pushstring(L, "__index");
         lua_newtable(L);
-        for (int i = 0; T::Register[i].name != NULL; i++) {
+        for(int i = 0; T::Register[i].name != NULL; i++){
             lua_pushstring(L, T::Register[i].name);
             lua_pushnumber(L, i);
             lua_pushcclosure(L, &Luna<T>::proxyFunc, 1);
@@ -82,5 +106,11 @@ private:
 protected:
     Luna();
 };
+
+template <class T> class LunaClass{
+protected:
+    T *proxy;
+};
+
 
 #endif

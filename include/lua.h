@@ -3,9 +3,7 @@
 
 #include <stdlib.h>
 
-#include "logic.h"
-#include "entity.h"
-#include "map.h"
+#include "entity.hpp"
 #include "luaLoader.hpp"
 
 extern lua_State *globalLuaState;

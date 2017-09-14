@@ -4,7 +4,7 @@ bulletData *bulletDatas;
 pbull worldBullets = NULL;
 
 int currentBulletID = 0;
-pbull createBullet(uid dataid, framerate appTime, pent owner, angle ang){
+pbull createBullet(uid dataid, framerate appTime, Entity &owner, angle ang){
     pbull e = new bullet;
     struct bulletData bdat = bulletDatas[dataid];
 
@@ -19,10 +19,10 @@ pbull createBullet(uid dataid, framerate appTime, pent owner, angle ang){
         exit(1);
     }
     e->nocollideAmount = 0;
-    addNoCollideEntToBullet(owner->globalid, e);
+    addNoCollideEntToBullet(owner.globalid, e);
 
-    e->x = owner->x;
-    e->y = owner->y;
+    e->x = owner.x;
+    e->y = owner.y;
     e->ang = ang;
 
     e->damage = bdat.damage;
@@ -35,7 +35,7 @@ pbull createBullet(uid dataid, framerate appTime, pent owner, angle ang){
     return e;
 }
 
-pbull createItemBullet(uid dataid, framerate appTime, pent owner, pitem it, angle ang){
+pbull createItemBullet(uid dataid, framerate appTime, Entity &owner, pitem it, angle ang){
     pbull e = createBullet(dataid, appTime, owner, ang);
     e->damage += itemDatas[it->itemid].baseDamage;
     return e;
@@ -71,11 +71,11 @@ void initializeBullets(){
     };
 }
 
-bool bulletHitboxTouching(pent e, pbull b){
-    position dx = e->x - b->x, dy = e->y - b->y;
+bool bulletHitboxTouching(Entity &e, pbull b){
+    position dx = e.x - b->x, dy = e.y - b->y;
     float dist = sqrt(dx * dx + dy * dy);
     //bullets have a circular hitbox of 16 px
-    return dist < MIN(e->w, e->h) + 16;
+    return dist < MIN(e.w, e.h) + 16;
 }
 
 void addNoCollideEntToBullet(uid id, pbull b){
@@ -90,9 +90,9 @@ void addNoCollideEntToBullet(uid id, pbull b){
     }
 }
 
-bool shouldBulletAndEntCollide(pent e, pbull b){
+bool shouldBulletAndEntCollide(Entity &e, pbull b){
     for(int i = 0; i < b->nocollideAmount; i++){
-        if(e->globalid == b->nocollide[i]) return false;
+        if(e.globalid == b->nocollide[i]) return false;
     }
     return true;
 }
@@ -103,13 +103,13 @@ void tickBullets(){
         dead = false;
         struct bulletData pdata = bulletDatas[e->dataid];
         //TODO O(n^2) = bad
-        for(pent ent = worldEntities; ent != NULL; ent = ent->next){
+        for(Entity ent : worldEntities){
             if(!shouldBulletAndEntCollide(ent, e)) continue;
             if(bulletHitboxTouching(ent, e)){
                 /*printf("Doing %i damage to ent %i (hp %i)\n", e->damage, ent->globalid, ent->hp);*/
-                hurtEntity(ent, e->damage);
+                ent.changeHealth(-e->damage);
                 if(pdata.flags & BFLAG_PIERCE){
-                    addNoCollideEntToBullet(ent->globalid, e);
+                    addNoCollideEntToBullet(ent.globalid, e);
                 }else{
                     dead = true;
                     goto BULLET_DEAD;

@@ -1,8 +1,8 @@
 #include "logic.h"
 
-pent controlledEntity = NULL;
+Entity *controlledEntity = nullptr;
 
-void setControlledEntity(pent e){
+void setControlledEntity(Entity *e){
     controlledEntity = e;
     cameraFollowEntity(e);
 }
@@ -61,9 +61,9 @@ static void controlEntity(){
     }
 
     if(direction != MOVED_NONE){
-        moveEntityAng(controlledEntity,
+        controlledEntity->moveAng(
             movementDirectionAngles[direction],
-            getEntityMovespeed(controlledEntity) * frameTime
+            controlledEntity->getMovespeed() * frameTime
         );
     }
 
@@ -76,34 +76,33 @@ static void controlEntity(){
 
 }
 
-/*static*/
 void logicUseItem(int slot){
-    entityUseItem(controlledEntity, slot);
+    if(controlledEntity != NULL) controlledEntity->useItem(slot);
 }
 
-void tickWallCheck(pent e){
-    int x = e->x;
-    int y = e->y;
-    int w2 = e->w/2;
-    int h2 = e->h/2;
+void tickWallCheck(Entity &e){
+    int x = e.x;
+    int y = e.y;
+    int w2 = e.w/2;
+    int h2 = e.h/2;
     int tileX = x/TILESIZE;
     int tileY = y/TILESIZE;
     if(tileX < 1 || tileY < 1 ||
        tileY >= WORLDSIZE - 1 || tileX >= WORLDSIZE - 1)
         return;
     if(tileDatas[gameworld[tileX - 1][tileY]].isSolid){
-        if(x - tileX*TILESIZE < w2) e->x = w2 + tileX*TILESIZE;
+        if(x - tileX*TILESIZE < w2) e.x = w2 + tileX*TILESIZE;
     }
     if(tileDatas[gameworld[tileX + 1][tileY]].isSolid){
         //HACKY: TILESIZE = PLAYER SIZE:::: CHANGE IN RELEASE
-        if(x - tileX*TILESIZE > w2) e->x = w2 + tileX*TILESIZE;
+        if(x - tileX*TILESIZE > w2) e.x = w2 + tileX*TILESIZE;
     }
     if(tileDatas[gameworld[tileX][tileY - 1]].isSolid){
-        if(y - tileY*TILESIZE < h2) e->y = h2 + tileY*TILESIZE;
+        if(y - tileY*TILESIZE < h2) e.y = h2 + tileY*TILESIZE;
     }
     if(tileDatas[gameworld[tileX][tileY + 1]].isSolid){
         //HACKY: TILESIZE = PLAYER SIZE:::: CHANGE IN RELEASE
-        if(y - tileY*TILESIZE > h2) e->y = h2 + tileY*TILESIZE;
+        if(y - tileY*TILESIZE > h2) e.y = h2 + tileY*TILESIZE;
     }
 }
 
@@ -124,47 +123,37 @@ void logicOnKeyPress(uint32_t code){
     }
 }
 
-static void tickAI(pent c){
+static void tickAI(Entity &c){
     //TODO implement in lua
-    if(c != controlledEntity && c->ai != NULL){
+    if(&c != controlledEntity && c.ai != NULL){
 
-switch(c->ai->currentMethod){
-case AI_NONE: break;
-case AI_WANDER: {
-    c->facing += (-1 + ((angle) (rand() % 16) * .5)) * frameTime;
-    moveEntityAng(c,
-        c->facing,
-        getEntityMovespeed(c) * frameTime
+switch(c.ai->currentMethod){
+case Entity::AI::AI_NONE: break;
+case Entity::AI::AI_WANDER: {
+    c.facing += (-1 + ((angle) (rand() % 16) * .5)) * frameTime;
+    c.moveAng(
+        c.facing,
+        c.getMovespeed() * frameTime
     );
 } break;
-case AI_CHASE: {
-    pent closestPlayer = findClosestEntity(c, 0);
-    if(!closestPlayer) break;
-
-    c->facing = atan2(closestPlayer->y - c->y, closestPlayer->x - c->x) + PI/2;
-
-    moveEntityAng(c,
-        c->facing,
-        getEntityMovespeed(c) * frameTime
-    );
-} break;
+case Entity::AI::AI_CHASE: break;
 }
 
     }
 }
 
-static void tickEntity(pent c){
-    stattype maxAbi = getEntityMaxAbility(c);
-    stattype maxHP  = getEntityMaxHealth(c);
-    if(c->abi < maxAbi) c->abi = MIN(maxAbi, c->abi + frameTime * getEntityRegenAbility(c));
-    if(c->hp < maxHP)  c->hp  = MIN(maxHP,  c->hp  + frameTime * getEntityRegenHealth(c));
+static void tickEntity(Entity &c){
+    stattype maxAbi = c.getMaxAbility();
+    stattype maxHP  = c.getMaxHealth();
+    if(c.abi < maxAbi) c.abi = MIN(maxAbi, c.abi + frameTime * c.getRegenAbility());
+    if(c.hp < maxHP)  c.hp   = MIN(maxHP,  c.hp  + frameTime * c.getRegenHealth());
 }
 
 void gameUpdate(){
     if(controlledEntity != NULL) controlEntity();
     tickBullets();
 
-    for(pent c = worldEntities; c != NULL; c = c->next){
+    for(Entity c : worldEntities){
         tickEntity(c);
         tickAI(c);
         tickWallCheck(c);

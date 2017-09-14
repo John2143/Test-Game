@@ -2,11 +2,11 @@
 
 position cameraX, cameraY;
 angle cameraAng;
-pent cameraFollowing;
+Entity *cameraFollowing = nullptr;
 int cameraYOffset, cameraXOffset;
 angle cameraZoom;
 
-void cameraFollowEntity(pent e){
+void cameraFollowEntity(Entity *e){
     cameraFollowing = e;
 }
 void cameraMoveTo(position x, position y){
@@ -33,11 +33,11 @@ void screenToWorld(int x, int y, int *relx, int *rely){
 void worldMousePosition(int *relx, int *rely){
     screenToWorld(mouseX, mouseY, relx, rely);
 }
-angle getLocalAimPosition(pent e){
+angle getLocalAimPosition(Entity &e){
     int x, y;
     worldMousePosition(&x, &y);
     return atan2(
-        y - e->y,
-        x - e->x
+        y - e.y,
+        x - e.x
     );
 }

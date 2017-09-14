@@ -20,7 +20,7 @@ static unsigned long clockDivisor;
 #include <time.h>
 
 #include "global.h"
-#include "entity.h"
+#include "entity.hpp"
 #include "input.h"
 #include "graphics.h"
 #include "logic.h"
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
     getClockTime(&frameStart);
 
     initLogic();
-    loadEntities();
+    Entity::loadData();
     loadTileTextures();
     initializeWorld();
     initializeBullets();
@@ -124,7 +124,7 @@ CLEANUP:
     uninitializeBullets();
     uninitializeWorld();
     unloadTileTextures();
-    unloadEntities();
+    Entity::unloadData();
     destroyGraphics(&g);
 
     return 0;

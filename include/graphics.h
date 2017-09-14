@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-#include "entity.h"
+#include "entity.hpp"
 #include "camera.h"
 #include "tile.h"
 #include "map.h"

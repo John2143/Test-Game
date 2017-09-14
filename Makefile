@@ -1,5 +1,5 @@
 CC=g++ -std=c++11 -MMD
-CFLAGS=-Wall -Wextra -Werror
+CFLAGS=-Wall -Wextra
 COM=$(CC) $(CFLAGS)
 D=
 SOURCES := $(wildcard src/*.cpp)
@@ -23,6 +23,6 @@ obj/%.o: src/%.cpp
 	$(COM) $(D) -Iinclude -c -o $@ $<
 
 clean:
-	rm $(EXECUTABLE).exe
 	rm obj/*.o
 	rm obj/*.d
+	rm $(EXECUTABLE).exe

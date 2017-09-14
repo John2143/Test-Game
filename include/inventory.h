@@ -41,8 +41,8 @@ typedef struct item{
     struct itemProperty itemProperties[];
 } *pitem;
 
-typedef struct entity *pent;
-typedef int (*itemUseFunction)(pent ent, pitem it);
+class Entity;
+typedef int (*itemUseFunction)(Entity &ent, pitem it);
 
 struct itemData{
     textureID texture;
@@ -60,6 +60,7 @@ struct inventory{
 };
 
 enum invError{
+    INVE_NONE = 0,
     INVE_NOSPACE = -1,
     INVE_NOINV = -2,
     INVE_BADSLOT = -3,
