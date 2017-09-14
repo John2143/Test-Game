@@ -9,9 +9,9 @@
 #define luaLoader_H
 
 extern "C" {
-    #include "lua.h"
-    #include "lauxlib.h"
-    #include "lualib.h"
+    #include <lua/lua.h>
+    #include <lua/lauxlib.h>
+    #include <lua/lualib.h>
 }
 
 template <class T> class Luna{
@@ -52,7 +52,6 @@ private:
 
         //Get the object but keep it on the stack (to mimic 'return self')
         T *obj = getObjFromStack(L, 1);
-        stackDump(L);
 
         //Run proxied member function
         return (obj->*(T::Register[i].member_function))(L);

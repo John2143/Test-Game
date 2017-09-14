@@ -25,10 +25,10 @@ extern struct font *globalFont;
 struct font *loadFont(const char *name, int bits, int width);
 
 struct graphics{
-	SDL_Window *window;
-	SDL_GLContext *glcontext;
-	int width, height;
-	int windowWidth, windowHeight;
+    SDL_Window *window;
+    SDL_GLContext glcontext;
+    int width, height;
+    int windowWidth, windowHeight;
 };
 
 void initiateGraphics(struct graphics *g, const char* name);

@@ -1,21 +1,28 @@
-CC=gcc -std=c11
-CFLAGS=-Wall -Wextra -pedantic -Iinclude
+CC=g++ -std=c++11 -MMD
+CFLAGS=-Wall -Wextra -Werror
+COM=$(CC) $(CFLAGS)
 D=
-FILES=game.c graphics.c input.c logic.c entity.c lua.c camera.c tile.c map.c bullet.c inventory.c itemFunctions.c
-SOURCES=$(addprefix src/, $(FILES))
-EXECUTABLE=game
+SOURCES := $(wildcard src/*.cpp)
+OBJ_FILES := $(addprefix obj/,$(notdir $(SOURCES:.cpp=.o)))
+
+EXECUTABLE = game
 ifeq ($(shell uname),Linux)
 LIBRARIES=-L. -lSDL2main -lSDL2 -lSDL2_image -lm -L./luasrc/src -llua -ldl -lGL
 else
 LIBRARIES=-L. -lSDL2main -lSDL2 -lOpengl32 -lglu32 -lSDL2_image -llua53
 endif
 
-OUTPUT=$(D) $(CFLAGS) $(SOURCES) $(LIBRARIES) -o $(EXECUTABLE)
+.PHONY: clean all
 
-all:
-	$(CC) -DDEBUG -g $(OUTPUT)
-prod:
-	$(CC) -O3 $(OUTPUT)
+all: $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJ_FILES)
+	$(COM) $^ $(LIBRARIES) -o $(EXECUTABLE).exe
+
+obj/%.o: src/%.cpp
+	$(COM) $(D) -Iinclude -c -o $@ $<
 
 clean:
 	rm $(EXECUTABLE).exe
+	rm obj/*.o
+	rm obj/*.d

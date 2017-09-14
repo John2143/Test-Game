@@ -22,7 +22,7 @@ pent newEntityShell(uid parentid, pent e){
     e->globalid = currentEntityID++;
     e->parentid = parentid;
 
-    e->textureID = defaultEntites[parentid].textureID;
+    e->tid = defaultEntites[parentid].tid;
     e->stats = defaultEntites[parentid].stats;
 
     setEntityPos(e, 200, 200);
@@ -31,13 +31,13 @@ pent newEntityShell(uid parentid, pent e){
     setEntityHealth(e, getEntityMaxHealth(e));
     setEntityAbility(e, getEntityMaxAbility(e));
 
-    e->inventory = NULL;
+    e->inv = NULL;
     //TODO
     if(parentid == 0){
-        e->inventory = createInventory(12);
-                   giveItem(e->inventory, createRandomItem(1));
-        int slot = giveItem(e->inventory, createRandomItem(0));
-        moveItem(e->inventory, slot, 4);
+        e->inv = createInventory(12);
+                   giveItem(e->inv, createRandomItem(1));
+        int slot = giveItem(e->inv, createRandomItem(0));
+        moveItem(e->inv, slot, 4);
     }
 
     e->facing = 0;
@@ -46,16 +46,17 @@ pent newEntityShell(uid parentid, pent e){
 }
 
 pent newEntity(uid parentid){
-    return newEntityShell(parentid, malloc(sizeof(struct entity)));
+    return newEntityShell(parentid, (pent) malloc(sizeof(struct entity)));
 }
 
 void deleteEntity(pent e){
-    if(e->inventory) freeInventory(e->inventory);
+    if(e->inv) freeInventory(e->inv);
+    if(e->ai) delete e->ai;
     free(e);
 }
 
 int entityUseItem(pent e, int slot){
-    struct inventory *inv = e->inventory;
+    inventory *inv = e->inv;
     if(!inv) return INVE_NOINV;
     pitem it = inv->items[slot];
     if(!it) return INVE_NOITEM;
@@ -113,24 +114,19 @@ void setEntityAbility(pent e, int abi){
 }
 
 void loadEntities(){
-    defaultEntites = malloc(50 * sizeof(*defaultEntites));
+    defaultEntites = new entityData[50];
 
     defaultEntites[0].name = "Player";
-    defaultEntites[0].textureID = loadTexture(assetFolderPath "player.png");
-    defaultEntites[0].stats = (struct stats) {
-        .vit = 10, .def = 5, .agi = 50, .abi = 5
-    };
+    defaultEntites[0].tid = loadTexture(assetFolderPath "player.png");
+    defaultEntites[0].stats.agi = 100;
 
     defaultEntites[1].name = "testname";
-    defaultEntites[1].textureID = loadTexture(assetFolderPath "meme.png");
-    defaultEntites[1].stats = (struct stats) {
-        .vit = 0, .def = 0, .agi = 0, .abi = 0
-    };
+    defaultEntites[1].tid = loadTexture(assetFolderPath "meme.png");
 
 }
 
 void unloadEntities(){
-    free(defaultEntites);
+    delete[] defaultEntites;
 }
 
 int getEntityMovespeed(pent e){
@@ -178,9 +174,10 @@ void embiggenEntity(pent e){
 }
 
 void grantAI(pent e, enum AI method){
+    if(e->ai) delete e->ai;
     if(method != AI_NONE){
         if(e->ai != NULL) free(e->ai);
-        e->ai = malloc(sizeof(*e->ai));
+        e->ai = new AIData;
         e->ai->currentMethod = method;
     }else{
         e->ai = NULL;

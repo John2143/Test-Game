@@ -27,7 +27,6 @@ extern textureID loadTexture(const char *name); //Defined in graphics.c
 size_t gsprintf(char *buf, size_t buflength, const char *fmt, ...);
 #define gprintf(buf, ...) gsprintf(buf, GSPR_NONE, ...)
 
-typedef enum {false, true} bool;
 extern float normalRandomFloat();
 extern float randomFloat(float a, float b);
 

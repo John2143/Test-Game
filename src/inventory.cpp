@@ -5,7 +5,7 @@ struct itemPropertyData *itemPropertyDatas;
 int64_t itemGlobalID = 0;
 
 void initializeItems(){
-    itemDatas = malloc(8 * sizeof(*itemDatas));
+    itemDatas = new itemData[8];
     itemDatas[0].baseNumProps = 3;
     itemDatas[0].baseRarity = RARITY_BASIC;
     itemDatas[0].texture = loadTexture(assetFolderPath "brick.png");
@@ -22,7 +22,7 @@ void initializeItems(){
     itemDatas[1].abiCost = 0;
     /*itemDatas[1].onUse = NULL;*/
 
-    itemPropertyDatas = malloc(8 * sizeof(*itemPropertyDatas));
+    itemPropertyDatas = new itemPropertyData[8];
     itemPropertyDatas[0].formatStr = "+%i Primary Attribute";
     itemPropertyDatas[0].valueType = IPVT_INT64;
     itemPropertyDatas[0].valueMin.i = 10;
@@ -35,12 +35,12 @@ void initializeItems(){
 }
 
 void uninitializeItems(){
-    free(itemDatas);
-    free(itemPropertyDatas);
+    delete[] itemDatas;
+    delete[] itemPropertyDatas;
 }
 
 struct inventory *createInventory(int size){
-    struct inventory *i = calloc(1, sizeof(*i) + size * sizeof(pitem));
+    inventory *i = (inventory *) calloc(1, sizeof(*i) + size * sizeof(pitem));
     i->size = size;
     return i;
 }
@@ -66,7 +66,7 @@ static void randomProperty(struct itemProperty *ip){
 
 pitem createRandomItem(uid itemid){
     int numprops = itemDatas[itemid].baseNumProps;
-    pitem item = malloc(sizeof(*item) + numprops * sizeof(struct itemProperty));
+    pitem item = (pitem) malloc(sizeof(*item) + numprops * sizeof(struct itemProperty));
     item->globalid = itemGlobalID++;
     item->itemid = itemid;
     item->lastUse = 0;

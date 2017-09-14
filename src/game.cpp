@@ -1,5 +1,6 @@
 static unsigned long clockDivisor;
 
+#define WIN32 _WIN32
 #ifdef WIN32
 #    include <Windows.h>
 #    define thread DWORD
@@ -9,13 +10,14 @@ static unsigned long clockDivisor;
 #    define clockType LARGE_INTEGER
 #else
 #    include <pthread.h>
-#    include <time.h>
 #    define thread pthread
 #    define newThread(f, arg, id) pthread_create(id, NULL, f, arg)
 #    define threadRType void*
 #    define threadExit() pthread_exit(NULL);
 #    define clockType int
 #endif
+
+#include <time.h>
 
 #include "global.h"
 #include "entity.h"
@@ -63,14 +65,10 @@ int main(int argc, char** argv) {
 #endif
     printf("Starting\nClock divisor: %lu\n", clockDivisor);
 
-    struct graphics g = {
-#ifdef SHOWKEYS
-        .width = 100, .height = 100,
-#else
-        .width = 1200,
-        .height = 900,
-#endif
-    };
+    graphics g;
+    g.height = 900;
+    g.width = 1200;
+
     initiateGraphics(&g, "Test window");
 
     if(!g.window) goto CLEANUP;

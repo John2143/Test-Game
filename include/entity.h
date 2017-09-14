@@ -20,7 +20,7 @@ struct AIData{
 };
 
 struct entityData{
-    textureID textureID;
+    textureID tid;
     struct stats stats; //Default stats of a entity
     const char *name;
     int scale;
@@ -30,7 +30,7 @@ typedef struct entity{
     uid globalid;
     uid parentid;
 
-    GLuint textureID;
+    textureID tid;
     //size_t textureOffset;
 
     position x, y;
@@ -39,13 +39,13 @@ typedef struct entity{
     stattype hp, abi;
     struct stats stats; //Customs stats: modified at spawn time
 
-    struct AIData *ai;
+    AIData *ai;
     char *name;
 
-    struct inventory *inventory;
+    inventory *inv;
 
-    struct entity *next;
-    struct entity *last;
+    entity *next;
+    entity *last;
 } *pent;
 
 //I normally don't typdef structs, but I have a feeling struct entity * will be used a lot.

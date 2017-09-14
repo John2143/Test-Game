@@ -1,14 +1,12 @@
 #ifndef lua_H
 #define lua_H
 
-#include <lua/lua.h>
-#include <lua/lualib.h>
-#include <lua/lauxlib.h>
-
 #include <stdlib.h>
 
 #include "logic.h"
 #include "entity.h"
+#include "map.h"
+#include "luaLoader.hpp"
 
 extern lua_State *globalLuaState;
 

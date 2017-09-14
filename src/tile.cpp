@@ -3,7 +3,7 @@
 struct tile *tileDatas;
 
 void loadTileTextures(){
-    tileDatas = calloc(sizeof(struct tile), 50);
+    tileDatas = new tile[50];
 
     tileDatas[0].texture = loadTexture(assetFolderPath "missing.png");
     tileDatas[1].texture = loadTexture(assetFolderPath "brick.png");
@@ -13,5 +13,5 @@ void loadTileTextures(){
 }
 
 void unloadTileTextures(){
-    free(tileDatas);
+    delete[] tileDatas;
 }

@@ -1,11 +1,11 @@
 #include "graphics.h"
 
 static void logWindowDetails(const char * detail, SDL_DisplayMode *mode){
-	printf("%s:\n  %ix%i @ %i\n  %i monitors\n",
-		detail,
-		mode->w, mode->h, mode->refresh_rate,
-		SDL_GetNumVideoDisplays()
-	);
+    printf("%s:\n  %ix%i @ %i\n  %i monitors\n",
+        detail,
+        mode->w, mode->h, mode->refresh_rate,
+        SDL_GetNumVideoDisplays()
+    );
 }
 
 static textureID areaTexture;
@@ -13,15 +13,15 @@ struct font *globalFont, *globalMonoFont;
 static GLint LODlevel = 0;
 
 void initiateGraphics(struct graphics *g, const char* name){
-	if(SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0){
+    if(SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0){
         printf("SDL failed to start: %s", SDL_GetError());
         return;
     }
-	g->window = SDL_CreateWindow(
-		name,
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, g->width, g->height,
-		SDL_WINDOW_OPENGL
-	);
+    g->window = SDL_CreateWindow(
+        name,
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, g->width, g->height,
+        SDL_WINDOW_OPENGL
+    );
     setCameraOffset(g->width/2, g->height/2);
 
     if(!g->window){
@@ -33,15 +33,15 @@ void initiateGraphics(struct graphics *g, const char* name){
         return;
     }
 
-	SDL_DisplayMode mode;
-	SDL_GetWindowDisplayMode(g->window, &mode);
-	logWindowDetails("Default", &mode);
+    SDL_DisplayMode mode;
+    SDL_GetWindowDisplayMode(g->window, &mode);
+    logWindowDetails("Default", &mode);
 
-	g->glcontext = SDL_GL_CreateContext(g->window);
-	g->windowHeight = mode.h;
-	g->windowWidth = mode.w;
-	glClearColor(0, 0, 0, 1);
-	setVSync(0);
+    g->glcontext = SDL_GL_CreateContext(g->window);
+    g->windowHeight = mode.h;
+    g->windowWidth = mode.w;
+    glClearColor(0, 0, 0, 1);
+    setVSync(0);
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
@@ -54,7 +54,7 @@ void initiateGraphics(struct graphics *g, const char* name){
 
 struct font *loadFont(const char *name, int bits, int width){
     SDL_Surface *fullFont;
-    struct font *newFont = malloc(sizeof(struct font));
+    font *newFont = new font;
     newFont->bits = bits;
 
     {
@@ -64,7 +64,7 @@ struct font *loadFont(const char *name, int bits, int width){
         fullFont = IMG_Load(buff);
         if(fullFont == NULL){
             printf("Failed to load image: %s\n", IMG_GetError());
-            free(newFont);
+            delete newFont;
             return NULL;
         }
         strcpy(buff, name);
@@ -78,7 +78,7 @@ struct font *loadFont(const char *name, int bits, int width){
         fclose(fp);
     }
 
-    SDL_SetSurfaceBlendMode(fullFont, SDL_BLENDMODE_NONE | SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceBlendMode(fullFont, (SDL_BlendMode) (SDL_BLENDMODE_NONE | SDL_BLENDMODE_BLEND));
     SDL_SetColorKey(fullFont, SDL_TRUE, SDL_MapRGB(fullFont->format, 0, 0, 0));
 
     for(int i = 0, ty = 0; ; ty++){
@@ -102,7 +102,7 @@ FINISH:
 
 FAILEDLOAD:
     printf("Failed to load kerning\n");
-    free(newFont);
+    delete newFont;
     return NULL;
 }
 
@@ -134,9 +134,9 @@ textureID loadTextureFromSurface(SDL_Surface *texture){
 void destroyGraphics(struct graphics *g){
     IMG_Quit();
 
-	SDL_GL_DeleteContext(g->glcontext);
-	SDL_DestroyWindow(g->window);
-	SDL_Quit();
+    SDL_GL_DeleteContext(g->glcontext);
+    SDL_DestroyWindow(g->window);
+    SDL_Quit();
 }
 
 void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang){
@@ -211,7 +211,7 @@ static void renderWorld2D(struct graphics *g){
     for(pent c = worldEntities; c != NULL; c = c->next){
         int x = (int) c->x - cameraX, y = (int) c->y - cameraY;
         if(inRender(x, y, c->w, c->h)){
-            renderSquareTexture(c->textureID, x - c->w/2, y - c->h/2, c->w, c->h);
+            renderSquareTexture(c->tid, x - c->w/2, y - c->h/2, c->w, c->h);
             renderedEnts++;
         }
     }
@@ -366,13 +366,13 @@ static void renderInterface(struct graphics *g){
 
         ENDPANELW(tbu + bu + statsText); //END stats panel
 
-        if(lp->inventory){
+        if(lp->inv){
             const int sidebuff = 4;
             const int dsidebuff = sidebuff * 2;
             const int itemsize = 32;
             const int itembuffer = 6;
 
-            struct inventory *inv = lp->inventory;
+            inventory *inv = lp->inv;
             xoffset = bu;
             bool incrementY = false;
             for(unsigned int i = 0; i < inv->size; i++){
@@ -414,15 +414,15 @@ void renderGraphics(struct graphics *g){
     glClear(GL_COLOR_BUFFER_BIT);
 #endif
 
-	glPushMatrix();
-		glOrtho(0., g->width, g->height, 0., 0., 1.);
-		glColor3f(1.0f, 1.0f, 1.0f);
+    glPushMatrix();
+        glOrtho(0., g->width, g->height, 0., 0., 1.);
+        glColor3f(1.0f, 1.0f, 1.0f);
         renderWorld2D(g);
-		renderInterface(g);
+        renderInterface(g);
         renderStatusBar(g);
-	glPopMatrix();
+    glPopMatrix();
 
-	SDL_GL_SwapWindow(g->window);
+    SDL_GL_SwapWindow(g->window);
 }
 
 int renderChar(const struct font *f, const unsigned char c, int x, int y, int scale){
@@ -435,7 +435,7 @@ int renderText(const struct font *f, const char *text, int x, int y, int scale){
     const char *c = text;
     int len = 0;
     while(*c) len += renderChar(f, *c++, x + len, y, scale) + scale;
-	return len - scale;
+    return len - scale;
 }
 
 int renderTextJust(const struct font *f, const char *text, int x, int y, int scale, enum justification just){
@@ -459,5 +459,5 @@ int textLength(const struct font *f, const char *text, int scale){
 }
 
 void setVSync(bool vsync){
-	SDL_GL_SetSwapInterval(!!vsync);
+    SDL_GL_SetSwapInterval(!!vsync);
 }

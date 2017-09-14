@@ -1,11 +1,11 @@
 #include "bullet.h"
 
-struct bulletData *bulletDatas;
+bulletData *bulletDatas;
 pbull worldBullets = NULL;
 
 int currentBulletID = 0;
 pbull createBullet(uid dataid, framerate appTime, pent owner, angle ang){
-    pbull e = malloc(sizeof(*e));
+    pbull e = new bullet;
     struct bulletData bdat = bulletDatas[dataid];
 
     e->globalid = currentBulletID++;
@@ -13,7 +13,7 @@ pbull createBullet(uid dataid, framerate appTime, pent owner, angle ang){
     e->ctime = appTime;
 
     e->nocollideAmountMax = 4;
-    e->nocollide = malloc(e->nocollideAmountMax * sizeof(uid));
+    e->nocollide = (uid *) malloc(e->nocollideAmountMax * sizeof(uid));
     if(!e->nocollide){
         printf("Out of memory @ createBullet\n");
         exit(1);
@@ -46,11 +46,11 @@ void removeBullet(pbull e){
     if(e->next) e->next->last = e->last;
     if(worldBullets == e) worldBullets = e->next;
     free(e->nocollide);
-    free(e);
+    delete e;
 }
 
 void initializeBullets(){
-    bulletDatas = malloc(50 * sizeof(*bulletDatas));
+    bulletDatas = new bulletData[50];
 
     bulletDatas[0] = (struct bulletData) {
         .speed = 500,
@@ -82,7 +82,7 @@ void addNoCollideEntToBullet(uid id, pbull b){
     b->nocollide[b->nocollideAmount++] = id;
     if(b->nocollideAmount >= b->nocollideAmountMax){
         b->nocollideAmountMax = b->nocollideAmountMax * 2;
-        b->nocollide = realloc(b->nocollide, b->nocollideAmountMax * sizeof(uid));
+        b->nocollide = (uid *) realloc(b->nocollide, b->nocollideAmountMax * sizeof(uid));
         if(!b->nocollide){
             printf("Out of memory @ addCollideEntToBullet\n");
             exit(1);
@@ -140,7 +140,7 @@ void tickBullets(){
 void uninitializeBullets(){
     for(pbull b = worldBullets; b != NULL;){
         pbull next = b->next;
-        free(b);
+        delete b;
         b = next;
     }
 }
