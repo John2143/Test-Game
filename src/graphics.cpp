@@ -250,7 +250,7 @@ static void renderStatusBar(struct graphics *g){
         renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
     }
     int rmx, rmy;
-    worldMousePosition(&rmx, &rmy);
+    worldMousePosition(rmx, rmy);
     sprintf(buf, "%i %i, %i mxy %i, %i rmxy", mouseState, mouseX, mouseY, rmx, rmy);
     renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
 

@@ -29,6 +29,7 @@ Entity::Entity(uid pid): parentid(pid) {
     //}
 
     this->facing = 0;
+    this->ai = nullptr;
     this->grantAI(AI_NONE);
 
     worldEntities.push_back(*this);

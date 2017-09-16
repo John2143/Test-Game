@@ -16,8 +16,8 @@ void cameraMoveTo(position x, position y);
 void setCameraOffset(int x, int y);
 void setCameraZoom(angle zoom);
 
-void screenToWorld(int x, int y, int *relx, int *rely);
-void worldMousePosition(int *relx, int *rely);
+void screenToWorld(int x, int y, int &relx, int &rely);
+void worldMousePosition(int &relx, int &rely);
 angle getLocalAimPosition(Entity &e);
 
 void cameraTick();

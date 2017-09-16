@@ -5,6 +5,8 @@
 #include "entity.h"
 #include "inventory.h"
 
+#include <cmath>
+
 enum bulletFlags{
     BFLAG_PIERCE = 1 << 0,
     BFLAG_MELEE = 1 << 1,

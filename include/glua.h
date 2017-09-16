@@ -1,7 +1,8 @@
 #ifndef lua_H
 #define lua_H
 
-#include "lua.hpp"
+#include "global.h"
+
 #include <cstring>
 #include <cstdlib>
 

@@ -21,7 +21,13 @@ public:
         int (T::*member_function)(lua_State *L);
     };
 
-    static void Register(lua_State* L) {
+    static int nameFunc(lua_State *L){
+        lua_pop(L, 1);
+        lua_pushstring(L, T::className);
+        return 1;
+    }
+
+    static void Register(lua_State *L) {
         //Register the keyword as a global function that returns the userdata
         lua_pushcfunction(L, &Luna<T>::newT);
         lua_setglobal(L, T::className);
@@ -43,6 +49,13 @@ public:
         lua_pushstring(L, "__gc");
         lua_pushcfunction(L, &Luna<T>::gc);
         lua_settable(L, -3);
+
+        lua_pushstring(L, "__tostring");
+        lua_pushcclosure(L, &Luna<T>::nameFunc, 0);
+        lua_settable(L, -3);
+
+        printf("Registered lua class '%s'\n", T::className);
+
         lua_pop(L, 1);
     }
 

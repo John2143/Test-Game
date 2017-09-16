@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "tile.h"
+#include <cstring>
 
 #define WORLDSIZE 70
 #define CLAMPWORLD(val) (MIN(MAX(val, 0), WORLDSIZE))

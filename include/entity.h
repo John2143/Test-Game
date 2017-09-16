@@ -11,9 +11,9 @@
 class Entity{
 public:
     enum AI{
-        AI_NONE,
-        AI_WANDER,
-        AI_CHASE,
+        AI_NONE = 0,
+        AI_WANDER = 1,
+        AI_CHASE = 2,
     };
 
     struct AIData{

@@ -41,6 +41,10 @@ static void getClockTime(clockType *val){
 #endif
 }
 
+std::string operator "" _s(const char *t, size_t s){
+    return std::string(t, s);
+}
+
 static framerate getDiffClock(clockType a, clockType b){
 #ifdef WIN32
     long diff = b.QuadPart - a.QuadPart;

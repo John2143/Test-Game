@@ -18,7 +18,11 @@ int callLuaGameFunc(const char *name, int nargs, int nret){
     while(args--) lua_insert(L, 2);
 
     int ret = lua_pcall(L, nargs + 1, nret, 0);
-    //lua_pop(L, 1);
+    if(ret){
+        printf("Error in -%s-, %i\n%s\n", name, ret, lua_tostring(L, -1));
+        lua_pop(L, 1);
+    }
+
     return ret;
 }
 

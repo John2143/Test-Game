@@ -1,9 +1,9 @@
 #include "camera.h"
 
-position cameraX, cameraY;
-angle cameraAng;
+position cameraX = 0, cameraY = 0;
+angle cameraAng = 0;
 Entity *cameraFollowing = nullptr;
-int cameraYOffset, cameraXOffset;
+int cameraYOffset = 0, cameraXOffset = 0;
 angle cameraZoom;
 
 void cameraFollowEntity(Entity *e){
@@ -21,21 +21,21 @@ void setCameraZoom(angle zoom){
     (void) zoom;
 }
 void cameraTick(){
-    if(cameraFollowing != NULL){
+    if(cameraFollowing != nullptr){
         cameraMoveTo(cameraFollowing->x - cameraXOffset, cameraFollowing->y - cameraYOffset);
     }
 }
-void screenToWorld(int x, int y, int *relx, int *rely){
+void screenToWorld(int x, int y, int &relx, int &rely){
     //TODO make this not so hacky
-    if(relx) *relx = (cameraX + x);
-    if(rely) *rely = (cameraY + y);
+    if(relx) relx = (cameraX + x);
+    if(rely) rely = (cameraY + y);
 }
-void worldMousePosition(int *relx, int *rely){
+void worldMousePosition(int &relx, int &rely){
     screenToWorld(mouseX, mouseY, relx, rely);
 }
 angle getLocalAimPosition(Entity &e){
     int x, y;
-    worldMousePosition(&x, &y);
+    worldMousePosition(x, y);
     return atan2(
         y - e.y,
         x - e.x

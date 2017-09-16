@@ -2,10 +2,9 @@
 #define global_H
 
 #include "stl.h"
+#include <string>
 
-std::string operator "" _s(const char *t, size_t s){
-    return std::string(t, s);
-}
+std::string operator "" _s(const char *t, size_t s);
 
 typedef double framerate;
 typedef double stattype;
