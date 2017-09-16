@@ -103,13 +103,13 @@ void tickBullets(){
         dead = false;
         struct bulletData pdata = bulletDatas[e->dataid];
         //TODO O(n^2) = bad
-        for(Entity ent : worldEntities){
-            if(!shouldBulletAndEntCollide(ent, e)) continue;
-            if(bulletHitboxTouching(ent, e)){
+        for(Entity *ent : worldEntities){
+            if(!shouldBulletAndEntCollide(*ent, e)) continue;
+            if(bulletHitboxTouching(*ent, e)){
                 /*printf("Doing %i damage to ent %i (hp %i)\n", e->damage, ent->globalid, ent->hp);*/
-                ent.changeHealth(-e->damage);
+                ent->changeHealth(-e->damage);
                 if(pdata.flags & BFLAG_PIERCE){
-                    addNoCollideEntToBullet(ent.globalid, e);
+                    addNoCollideEntToBullet(ent->globalid, e);
                 }else{
                     dead = true;
                     goto BULLET_DEAD;

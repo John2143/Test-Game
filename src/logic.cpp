@@ -153,10 +153,10 @@ void gameUpdate(){
     if(controlledEntity != NULL) controlEntity();
     tickBullets();
 
-    for(Entity c : worldEntities){
-        tickEntity(c);
-        tickAI(c);
-        tickWallCheck(c);
+    for(Entity *c : worldEntities){
+        tickEntity(*c);
+        tickAI(*c);
+        tickWallCheck(*c);
     }
 }
 

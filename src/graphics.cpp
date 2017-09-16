@@ -208,10 +208,10 @@ static void renderWorld2D(struct graphics *g){
     }
 
     renderedEnts = 0;
-    for(Entity c : worldEntities){
-        int x = (int) c.x - cameraX, y = (int) c.y - cameraY;
-        if(inRender(x, y, c.w, c.h)){
-            renderSquareTexture(c.tid, x - c.w/2, y - c.h/2, c.w, c.h);
+    for(Entity *c : worldEntities){
+        int x = (int) c->x - cameraX, y = (int) c->y - cameraY;
+        if(inRender(x, y, c->w, c->h)){
+            renderSquareTexture(c->tid, x - c->w/2, y - c->h/2, c->w, c->h);
             renderedEnts++;
         }
     }

@@ -1,6 +1,7 @@
 #include "entity.h"
+#include <algorithm>
 
-std::vector<Entity> worldEntities;
+std::vector<Entity *> worldEntities;
 
 static size_t numEntities;
 static Entity::entityData *defaultEntites;
@@ -31,8 +32,6 @@ Entity::Entity(uid pid): parentid(pid) {
     this->facing = 0;
     this->ai = nullptr;
     this->grantAI(AI_NONE);
-
-    worldEntities.push_back(*this);
 }
 
 Entity::~Entity(){
@@ -170,10 +169,15 @@ void Entity::kill(){
 }
 
 void Entity::spawn(){
-    worldEntities.push_back(*this);
+    worldEntities.push_back(this);
 }
 
 void Entity::unspawn(){
+    auto it = std::find(worldEntities.begin(), worldEntities.end(), this);
+    if(it != worldEntities.end()){
+        std::swap(*it, worldEntities.back());
+        worldEntities.pop_back();
+    }
 }
 
 

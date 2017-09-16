@@ -79,6 +79,6 @@ public:
     void unspawn();
 };
 
-extern std::vector<Entity> worldEntities;
+extern std::vector<Entity *> worldEntities;
 extern void setControlledEntity(Entity *e);
 #endif

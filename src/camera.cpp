@@ -27,8 +27,8 @@ void cameraTick(){
 }
 void screenToWorld(int x, int y, int &relx, int &rely){
     //TODO make this not so hacky
-    if(relx) relx = (cameraX + x);
-    if(rely) rely = (cameraY + y);
+    relx = (cameraX + x);
+    rely = (cameraY + y);
 }
 void worldMousePosition(int &relx, int &rely){
     screenToWorld(mouseX, mouseY, relx, rely);
