@@ -2,7 +2,7 @@
 #define camera_H
 
 #include "global.h"
-#include "entity.hpp"
+#include "entity.h"
 #include "input.h"
 
 extern position cameraX, cameraY;

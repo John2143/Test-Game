@@ -20,11 +20,11 @@ static unsigned long clockDivisor;
 #include <time.h>
 
 #include "global.h"
-#include "entity.hpp"
+#include "entity.h"
 #include "input.h"
 #include "graphics.h"
 #include "logic.h"
-#include "lua.h"
+#include "glua.h"
 #include "map.h"
 #include "tile.h"
 #include "bullet.h"
@@ -69,14 +69,21 @@ int main(int argc, char** argv) {
     g.height = 900;
     g.width = 1200;
 
-    initiateGraphics(&g, "Test window");
-
-    if(!g.window) goto CLEANUP;
     /*thread t;*/
     /*newThread(test, NULL, &t);*/
 
     clockType frameStart, frameEnd, gameStart;
     getClockTime(&frameStart);
+
+    if(luaStart()){
+        printf("Lua could not initialize so quitting now\n");
+        goto LUA_FAIL;
+    }
+
+    initiateGraphics(&g, "Test window");
+    if(!g.window) goto CLEANUP;
+
+    callLuaGameFunc("preInit", 0, 0);
 
     initLogic();
     Entity::loadData();
@@ -85,7 +92,9 @@ int main(int argc, char** argv) {
     initializeBullets();
     initializeItems();
     initializeItemFunctions();
-    luaStart();
+    callLuaGameFunc("postInit", 0, 0);
+
+    fflush(stdout);
 
     getClockTime(&gameStart);
 
@@ -118,7 +127,7 @@ int main(int argc, char** argv) {
     }
 CLEANUP:
 
-    luaEnd();
+    callLuaGameFunc("preExit", 0, 0);
     uninitializeItems();
     uninitializeItemFunctions();
     uninitializeBullets();
@@ -126,6 +135,10 @@ CLEANUP:
     unloadTileTextures();
     Entity::unloadData();
     destroyGraphics(&g);
+    callLuaGameFunc("postExit", 0, 0);
+
+LUA_FAIL:
+    luaEnd();
 
     return 0;
 }

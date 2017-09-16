@@ -1,33 +1,16 @@
-#include "entity.hpp"
-
-const char Entity_L::className[] = "Entity";
-Luna<Entity_L>::RegType Entity_L::Register[] = {
-    {"move", &Entity_L::move},
-    {"setPos", &Entity_L::setPos},
-    {"setHealth", &Entity_L::setHealth},
-    {"changeHealth", &Entity_L::changeHealth},
-    {"setAbility", &Entity_L::setAbility},
-    {"getMovespeed", &Entity_L::getMovespeed},
-    {"getMaxHealth", &Entity_L::getMaxHealth},
-    {"getMaxAbility", &Entity_L::getMaxAbility},
-    {"getRegenHealth", &Entity_L::getRegenHealth},
-    {"getRegenAbility", &Entity_L::getRegenAbility},
-    {"getName", &Entity_L::getName},
-    {"grantAI", &Entity_L::grantAI},
-    {"kill", &Entity_L::kill},
-    {"spawn", &Entity_L::spawn},
-    {"unspawn", &Entity_L::unspawn},
-    {"setControlled", &Entity_L::setControlled},
-    {NULL, NULL}
-};
+#include "entity.h"
 
 std::vector<Entity> worldEntities;
 
+static size_t numEntities;
 static Entity::entityData *defaultEntites;
+
 unsigned int Entity::currentEntityID = 0;
 
 Entity::Entity(uid pid): parentid(pid) {
     this->globalid = Entity::currentEntityID++;
+
+    if(numEntities < parentid) throw "No entity with ID"_s;
 
     this->tid = defaultEntites[parentid].tid;
     this->stats = defaultEntites[parentid].stats;
@@ -36,7 +19,6 @@ Entity::Entity(uid pid): parentid(pid) {
 
     this->setHealth(this->getMaxHealth());
     this->setAbility(this->getMaxAbility());
-    this->name = nullptr;
 
     this->inv = nullptr;
     //if(parentid == 0){
@@ -48,6 +30,8 @@ Entity::Entity(uid pid): parentid(pid) {
 
     this->facing = 0;
     this->grantAI(AI_NONE);
+
+    worldEntities.push_back(*this);
 }
 
 Entity::~Entity(){
@@ -79,14 +63,42 @@ void Entity::move(position x, position y){
 }
 
 void Entity::loadData(){
-    defaultEntites = new entityData[50];
 
-    defaultEntites[0].name = "Player";
-    defaultEntites[0].tid = loadTexture(assetFolderPath "player.png");
-    defaultEntites[0].stats.agi = 100;
+    lua_getfield(L, -1, "data");
+    lua_getfield(L, -1, "entity");
+    lua_len(L, -1);
 
-    defaultEntites[1].name = "testname";
-    defaultEntites[1].tid = loadTexture(assetFolderPath "meme.png");
+    numEntities = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    defaultEntites = new Entity::entityData[numEntities];
+
+    printf("Made %i entities\n", numEntities);
+
+    for(size_t i = 0; i < numEntities; i++){
+        lua_geti(L, -1, i + 1);
+        if(!lua_istable(L, -1)) throw "Incorrect table format in entity data "_s;
+
+#define defineField(name, logic, sub) \
+        lua_getfield(L, -1, #name); \
+        defaultEntites[i]. sub name = logic; \
+        lua_pop(L, 1);
+
+        defineField(tid, (textureID) lua_tonumber(L, -1), );
+        defineField(name, std::string(lua_tostring(L, -1)), );
+        defineField(scale, lua_tonumber(L, -1), );
+
+        lua_getfield(L, -1, "stats");
+            defineField(agi, lua_tonumber(L, -1), stats. );
+            defineField(def, lua_tonumber(L, -1), stats. );
+            defineField(abi, lua_tonumber(L, -1), stats. );
+            defineField(vit, lua_tonumber(L, -1), stats. );
+        lua_pop(L, 1);
+
+        lua_pop(L, 1);
+    }
+
+    lua_pop(L, 2);
 }
 
 void Entity::unloadData(){
@@ -136,8 +148,8 @@ stattype Entity::getRegenAbility(){
     return this->getMaxAbility() / 15;
 }
 
-const char *Entity::getName(){
-    return this->name == NULL ? defaultEntites[this->parentid].name : this->name;
+std::string &Entity::getName(){
+    return this->name.empty() ? defaultEntites[this->parentid].name : this->name;
 }
 
 void Entity::grantAI(enum AI method){

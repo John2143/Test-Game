@@ -1,85 +1,8 @@
-#ifndef entity_H
-#define entity_H
+#ifndef entityL_H
+#define entityL_H
 
-#include <vector>
-#include "global.h"
-#include "inventory.h"
-#include "luaLoader.hpp"
-#include "logic.h"
-
-class Entity{
-public:
-    enum AI{
-        AI_NONE,
-        AI_WANDER,
-        AI_CHASE,
-    };
-
-    struct AIData{
-        enum AI currentMethod;
-    } *ai;
-
-    struct coreStats{
-        int def, agi, vit, abi;
-    } stats;
-
-    struct entityData{
-        textureID tid;
-        Entity::coreStats stats; //Default stats of a entity
-        const char *name;
-        int scale;
-    };
-
-    static unsigned int currentEntityID;
-
-    uid globalid;
-    uid parentid;
-
-    textureID tid;
-
-    position x, y;
-    int w, h;
-    angle facing;
-    stattype hp, abi;
-
-    char *name;
-
-    inventory *inv;
-
-    static void loadData();
-    static void unloadData();
-
-    Entity(uid pid);
-    ~Entity();
-
-    invError useItem(int slot);
-    void setSize(int scale);
-
-    void move(position x, position y);
-    void moveAng(angle ang, double delta);
-    void setPos(position x, position y);
-
-    void setHealth(int hp);
-    void changeHealth(int hp);
-    void setAbility(int abi);
-
-    int getMovespeed();
-
-    stattype getMaxHealth();
-    stattype getMaxAbility();
-    stattype getRegenHealth();
-    stattype getRegenAbility();
-
-    const char *getName();
-    void grantAI(enum AI method);
-
-    void kill();
-    void spawn();
-    void unspawn();
-};
-
-extern std::vector<Entity> worldEntities;
-extern void setControlledEntity(Entity *e);
+#include "entity.h"
+#include "luaLoader.h"
 
 class Entity_L: public LunaClass<Entity>{
 public:
@@ -152,7 +75,7 @@ public:
     }
 
     int getName(lua_State *L){
-        lua_pushstring(L, proxy->getName());
+        lua_pushstring(L, proxy->getName().c_str());
         return 1;
     }
     int grantAI(lua_State *L){
@@ -177,9 +100,31 @@ public:
         return 1;
     }
     int setControlled(lua_State *L){
+        (void) L;
         setControlledEntity(proxy);
         return 1;
     }
+};
+
+const char Entity_L::className[] = "Entity";
+Luna<Entity_L>::RegType Entity_L::Register[] = {
+    {"move", &Entity_L::move},
+    {"setPos", &Entity_L::setPos},
+    {"setHealth", &Entity_L::setHealth},
+    {"changeHealth", &Entity_L::changeHealth},
+    {"setAbility", &Entity_L::setAbility},
+    {"getMovespeed", &Entity_L::getMovespeed},
+    {"getMaxHealth", &Entity_L::getMaxHealth},
+    {"getMaxAbility", &Entity_L::getMaxAbility},
+    {"getRegenHealth", &Entity_L::getRegenHealth},
+    {"getRegenAbility", &Entity_L::getRegenAbility},
+    {"getName", &Entity_L::getName},
+    {"grantAI", &Entity_L::grantAI},
+    {"kill", &Entity_L::kill},
+    {"spawn", &Entity_L::spawn},
+    {"unspawn", &Entity_L::unspawn},
+    {"setControlled", &Entity_L::setControlled},
+    {NULL, NULL}
 };
 
 #endif

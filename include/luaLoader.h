@@ -9,9 +9,9 @@
 #define luaLoader_H
 
 extern "C" {
-    #include "lua/lua.h"
-    #include "lua/lauxlib.h"
-    #include "lua/lualib.h"
+    #include <lua.h>
+    #include <lauxlib.h>
+    #include <lualib.h>
 }
 
 template <class T> class Luna{
@@ -20,30 +20,6 @@ public:
         const char *name;
         int (T::*member_function)(lua_State *L);
     };
-
-    static void StackDump(lua_State* L){
-        int i;
-        int top = lua_gettop(L);
-        for (i = 1; i <= top; i++) {  /* repeat for each level */
-            int t = lua_type(L, i);
-            switch (t) {
-                case LUA_TSTRING:  /* strings */
-                    printf("`%s'", lua_tostring(L, i));
-                    break;
-                case LUA_TBOOLEAN:  /* booleans */
-                    printf(lua_toboolean(L, i) ? "true" : "false");
-                    break;
-                case LUA_TNUMBER:  /* numbers */
-                    printf("%g", lua_tonumber(L, i));
-                    break;
-                default:  /* other values */
-                    printf("%s", lua_typename(L, t));
-                    break;
-            }
-            printf("  ");  /* put a separator */
-        }
-        printf("\n");  /* end the listing */
-    }
 
     static void Register(lua_State* L) {
         //Register the keyword as a global function that returns the userdata
@@ -67,6 +43,7 @@ public:
         lua_pushstring(L, "__gc");
         lua_pushcfunction(L, &Luna<T>::gc);
         lua_settable(L, -3);
+        lua_pop(L, 1);
     }
 
 private:

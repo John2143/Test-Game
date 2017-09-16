@@ -3,7 +3,7 @@
 
 #include "global.h"
 #include "inventory.h"
-#include "entity.hpp"
+#include "entity.h"
 #include "bullet.h"
 #include "camera.h"
 

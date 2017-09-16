@@ -410,9 +410,7 @@ static void renderInterface(struct graphics *g){
 }
 
 void renderGraphics(struct graphics *g){
-#ifdef DEBUG
     glClear(GL_COLOR_BUFFER_BIT);
-#endif
 
     glPushMatrix();
         glOrtho(0., g->width, g->height, 0., 0., 1.);

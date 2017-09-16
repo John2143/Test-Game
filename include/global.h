@@ -3,6 +3,10 @@
 
 #include "stl.h"
 
+std::string operator "" _s(const char *t, size_t s){
+    return std::string(t, s);
+}
+
 typedef double framerate;
 typedef double stattype;
 extern framerate appTime, frameTime;

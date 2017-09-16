@@ -5,5 +5,5 @@ tags
 test.*
 gprof.out
 gmon.out
-obj/*.o
-obj/*.d
+*.o
+*.d

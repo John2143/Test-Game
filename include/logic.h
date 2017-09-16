@@ -3,7 +3,7 @@
 
 #include "global.h"
 #include "input.h" //isKeyDown
-#include "entity.hpp"
+#include "entity.h"
 #include "camera.h" //cameraAng changes
 #include "inventory.h"
 #include "bullet.h"

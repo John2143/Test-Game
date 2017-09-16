@@ -2,7 +2,7 @@
 #define bullet_H
 
 #include "global.h"
-#include "entity.hpp"
+#include "entity.h"
 #include "inventory.h"
 
 enum bulletFlags{
