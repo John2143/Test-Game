@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
     clockType frameStart, frameEnd, gameStart;
     getClockTime(&frameStart);
 
-    if(luaStart()){
+    if(Lua::start()){
         printf("Lua could not initialize so quitting now\n");
         goto LUA_FAIL;
     }
@@ -87,16 +87,16 @@ int main(int argc, char** argv) {
     initiateGraphics(&g, "Test window");
     if(!g.window) goto CLEANUP;
 
-    callLuaGameFunc("preInit", 0, 0);
+    Lua::callGameFunc("preInit", 0, 0);
 
     initLogic();
     Entity::loadData();
     loadTileTextures();
     initializeWorld();
     initializeBullets();
-    initializeItems();
+    Item::initializeItems();
     initializeItemFunctions();
-    callLuaGameFunc("postInit", 0, 0);
+    Lua::callGameFunc("postInit", 0, 0);
 
     fflush(stdout);
 
@@ -131,18 +131,18 @@ int main(int argc, char** argv) {
     }
 CLEANUP:
 
-    callLuaGameFunc("preExit", 0, 0);
-    uninitializeItems();
+    Lua::callGameFunc("preExit", 0, 0);
+    Item::uninitializeItems();
     uninitializeItemFunctions();
     uninitializeBullets();
     uninitializeWorld();
     unloadTileTextures();
     Entity::unloadData();
     destroyGraphics(&g);
-    callLuaGameFunc("postExit", 0, 0);
+    Lua::callGameFunc("postExit", 0, 0);
 
 LUA_FAIL:
-    luaEnd();
+    Lua::end();
 
     return 0;
 }

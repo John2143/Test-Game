@@ -35,26 +35,28 @@ Entity::Entity(uid pid): parentid(pid) {
 }
 
 Entity::~Entity(){
-    if(this->inv) freeInventory(this->inv);
+    if(this->inv) delete this->inv;
     if(this->ai) delete this->ai;
 }
 
-invError Entity::useItem(int slot){
-    if(!this->inv) return INVE_NOINV;
-    pitem it = this->inv->items[slot];
-    if(!it) return INVE_NOITEM;
-    struct itemData idat = itemDatas[it->itemid];
-    if(this->abi < idat.abiCost) return INVE_NOABI;
-    if(appTime - it->lastUse < idat.cooldown) return INVE_ONCOOLDOWN;
-    itemUseFunction iuf = idat.onUse;
-    if(!iuf) return INVE_NOFUNC;
-    //int ret = iuf(this, it);
-    int ret = 0;
-    if(ret != INVE_DONTCOOLDOWN){
-        this->abi -= idat.abiCost;
+void Entity::useItem(int slot){
+    if(!this->inv) return;
+
+    Item *it = this->inv->items[slot];
+    if(!it) return;
+
+    Item::itemData &idat = it->getBaseData();
+    if(this->abi < idat.abiCost) return;
+    if(appTime - it->lastUse < idat.cooldown) return;
+
+    Item::itemUseFunction iuf = ***idat.onUse;
+    if(!iuf) return;
+
+    if(iuf(*this, *it)){
         it->lastUse = appTime;
+        this->abi -= idat.abiCost;
     }
-    return INVE_NONE;
+    return;
 }
 
 void Entity::move(position x, position y){
@@ -63,7 +65,6 @@ void Entity::move(position x, position y){
 }
 
 void Entity::loadData(){
-
     lua_getfield(L, -1, "data");
     lua_getfield(L, -1, "entity");
     lua_len(L, -1);

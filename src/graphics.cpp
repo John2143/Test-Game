@@ -372,7 +372,7 @@ static void renderInterface(struct graphics *g){
             const int itemsize = 32;
             const int itembuffer = 6;
 
-            inventory *inv = lp->inv;
+            Inventory *inv = lp->inv;
             xoffset = bu;
             bool incrementY = false;
             for(unsigned int i = 0; i < inv->size; i++){
@@ -380,12 +380,12 @@ static void renderInterface(struct graphics *g){
                     y += 32 + itembuffer + dsidebuff;
                     incrementY = false;
                 }
-                pitem it = inv->items[i];
+                Item *it = inv->items[i];
                 PANELCOLOR;
                 glRectiWH(infoBoxX + xoffset, y, dsidebuff + itemsize, dsidebuff + itemsize);
                 WHITECOLOR;
                 if(it){
-                    struct itemData itd = itemDatas[it->itemid];
+                    Item::itemData itd = it->getBaseData();
                     renderSquareTexture(itd.texture, infoBoxX + xoffset + sidebuff, y + sidebuff, itemsize, itemsize);
                 }else{
                     const char *const STEXT[] = {

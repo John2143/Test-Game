@@ -45,7 +45,7 @@ public:
 
     std::string name;
 
-    inventory *inv;
+    Inventory *inv;
 
     static void loadData();
     static void unloadData();
@@ -53,7 +53,7 @@ public:
     Entity(uid pid);
     ~Entity();
 
-    invError useItem(int slot);
+    void useItem(int slot);
     void setSize(int scale);
 
     void move(position x, position y);

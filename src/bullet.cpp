@@ -35,9 +35,9 @@ pbull createBullet(uid dataid, framerate appTime, Entity &owner, angle ang){
     return e;
 }
 
-pbull createItemBullet(uid dataid, framerate appTime, Entity &owner, pitem it, angle ang){
+pbull createItemBullet(uid dataid, framerate appTime, Entity &owner, Item *it, angle ang){
     pbull e = createBullet(dataid, appTime, owner, ang);
-    e->damage += itemDatas[it->itemid].baseDamage;
+    e->damage += it->getDamage();
     return e;
 }
 

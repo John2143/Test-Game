@@ -43,7 +43,7 @@ extern struct bulletData *bulletDatas;
 extern pbull worldBullets;
 
 pbull createBullet    (uid dataid, framerate appTime, Entity &owner,           angle ang);
-pbull createItemBullet(uid dataid, framerate appTime, Entity &owner, pitem it, angle ang);
+pbull createItemBullet(uid dataid, framerate appTime, Entity &owner, Item *it, angle ang);
 void removeBullet(pbull e);
 
 void initializeBullets();

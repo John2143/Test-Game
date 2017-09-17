@@ -5,12 +5,13 @@
 
 #include <cstring>
 #include <cstdlib>
-
 extern lua_State *L;
 
-int callLuaGameFunc(const char *name, int nargs, int nret);
-void luaStackDump();
-int luaStart();
-int luaEnd();
+namespace Lua{
+    int callGameFunc(const char *name, int nargs, int nret);
+    void stackDump();
+    int start();
+    int end();
+}
 
 #endif

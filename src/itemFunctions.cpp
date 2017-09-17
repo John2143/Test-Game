@@ -1,22 +1,22 @@
 #include "itemFunctions.h"
 
-static int IFShotgun(Entity &e, pitem it){
+static bool IFShotgun(Entity &e, Item &it){
     angle a = getLocalAimPosition(e);
-    createItemBullet(0, appTime, e, it, a);
-    createItemBullet(0, appTime, e, it, a - .15);
-    createItemBullet(0, appTime, e, it, a + .15);
-    return 0;
+    createItemBullet(0, appTime, e, &it, a);
+    createItemBullet(0, appTime, e, &it, a - .15);
+    createItemBullet(0, appTime, e, &it, a + .15);
+    return true;
 }
 
-static int IFWand(Entity &e, pitem it){
+static bool IFWand(Entity &e, Item &it){
     angle a = getLocalAimPosition(e);
-    createItemBullet(0, appTime, e, it, a);
-    return 0;
+    createItemBullet(0, appTime, e, &it, a);
+    return true;
 }
 
 void initializeItemFunctions(){
-    itemDatas[0].onUse = IFShotgun;
-    itemDatas[1].onUse = IFWand;
+    Item::itemDatas[0].onUse = IFShotgun;
+    Item::itemDatas[1].onUse = IFWand;
 }
 
 void uninitializeItemFunctions(){

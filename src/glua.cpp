@@ -3,7 +3,7 @@
 
 lua_State *L;
 
-int callLuaGameFunc(const char *name, int nargs, int nret){
+int Lua::callGameFunc(const char *name, int nargs, int nret){
     //Get the function from the game table
     lua_getfield(L, -1, name);
     if(!lua_isfunction(L, -1)){
@@ -27,7 +27,7 @@ int callLuaGameFunc(const char *name, int nargs, int nret){
 }
 
 //Copied from PIL 25.2
-void luaStackDump(){
+void Lua::stackDump(){
     int i;
     int top = lua_gettop(L);
     for (i = 1; i <= top; i++) {  /* repeat for each level */
@@ -69,7 +69,7 @@ static int luaLoadTexture(lua_State *L){
     return 1;
 }
 
-int luaStart(){
+int Lua::start(){
     L = luaL_newstate();
     luaL_openlibs(L);
 
@@ -93,7 +93,7 @@ int luaStart(){
     return 0;
 }
 
-int luaEnd(){
+int Lua::end(){
     lua_close(L);
     return 0;
 }
