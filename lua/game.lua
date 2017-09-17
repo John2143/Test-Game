@@ -7,7 +7,7 @@ function this:print(tab, spaces)
             print((" "):rep(spaces) .. i .. ":")
             this:print(v, spaces + 2)
         else
-            print((" "):rep(spaces) .. i .. ": " .. v)
+            print((" "):rep(spaces) .. i .. ": " .. tostring(v))
         end
     end
 end
@@ -20,8 +20,8 @@ function this:preInit()
     self.generateMap = require "map"
     self.data = {
         entity = require "entityData",
+        items = require "itemData",
     }
-    self:print(self.data);
 end
 
 --Everything is initialized, gameloop begins immediatly after this function ends

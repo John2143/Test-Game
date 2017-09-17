@@ -2,19 +2,18 @@
 #define inventory_H
 
 #include "global.h"
+#include "glua.h"
 
 class Entity;
 
 class Item{
 public:
-    typedef bool (itemUseFunction)(Entity &ent, Item &it);
-
     //Todo distinction between usable and nonusable items
     static struct itemData{
         textureID texture;
         framerate cooldown;
         int baseDamage;
-        itemUseFunction *onUse;
+        int onUse;
         int abiCost;
     } *itemDatas;
 
@@ -30,7 +29,6 @@ public:
 
     int getDamage();
     itemData &getBaseData();
-    //return if you can use it
 };
 
 class Inventory{

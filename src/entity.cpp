@@ -22,12 +22,12 @@ Entity::Entity(uid pid): parentid(pid) {
     this->setAbility(this->getMaxAbility());
 
     this->inv = nullptr;
-    //if(parentid == 0){
-        //e->inv = createInventory(12);
-                   //giveItem(e->inv, createRandomItem(1));
-        //int slot = giveItem(e->inv, createRandomItem(0));
-        //moveItem(e->inv, slot, 4);
-    //}
+    if(parentid == 0){
+        this->inv = new Inventory(12);
+                   this->inv->giveItem(new Item(1));
+        int slot = this->inv->giveItem(new Item(0));
+        this->inv->moveItem(slot, 4);
+    }
 
     this->facing = 0;
     this->ai = nullptr;
@@ -49,13 +49,17 @@ void Entity::useItem(int slot){
     if(this->abi < idat.abiCost) return;
     if(appTime - it->lastUse < idat.cooldown) return;
 
-    Item::itemUseFunction iuf = ***idat.onUse;
-    if(!iuf) return;
+    int iuf = idat.onUse;
+    if(iuf == LUA_REFNIL) return;
 
-    if(iuf(*this, *it)){
+    lua_rawgeti(L, LUA_REGISTRYINDEX, iuf);
+    lua_pcall(L, 0, 1, 0);
+    if(!lua_toboolean(L, -1)){
         it->lastUse = appTime;
         this->abi -= idat.abiCost;
     }
+
+    lua_pop(L, 1);
     return;
 }
 

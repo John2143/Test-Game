@@ -3,17 +3,39 @@
 int64_t globalID = 0;
 
 Item::itemData *Item::itemDatas;
+static size_t numItems;
 void Item::initializeItems(){
-    Item::itemDatas = new Item::itemData[8];
-    Item::itemDatas[0].texture = loadTexture(assetFolderPath "brick.png");
-    Item::itemDatas[0].cooldown = 1.0;
-    Item::itemDatas[0].baseDamage = 5;
-    Item::itemDatas[0].abiCost = 10;
+    lua_getfield(L, -1, "data");
+    lua_getfield(L, -1, "items");
+    lua_len(L, -1);
 
-    Item::itemDatas[1].texture = loadTexture(assetFolderPath "water.png");
-    Item::itemDatas[1].cooldown = .3;
-    Item::itemDatas[1].baseDamage = 5;
-    Item::itemDatas[1].abiCost = 0;
+    numItems = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    itemDatas = new Item::itemData[numItems];
+
+    printf("Made %i items\n", numItems);
+
+    for(size_t i = 0; i < numItems; i++){
+        lua_geti(L, -1, i + 1);
+        if(!lua_istable(L, -1)) throw "Incorrect table format in item datadata "_s;
+
+#define defineField(name, logic) \
+        lua_getfield(L, -1, #name); \
+        itemDatas[i]. name = logic; \
+        lua_pop(L, 1);
+
+        defineField(texture, (textureID) lua_tonumber(L, -1));
+        defineField(cooldown, lua_tonumber(L, -1));
+        defineField(baseDamage, lua_tonumber(L, -1));
+        defineField(abiCost, lua_tonumber(L, -1));
+        lua_getfield(L, -1, "onUse");
+        itemDatas[i].onUse = luaL_ref(L, LUA_REGISTRYINDEX);
+
+        lua_pop(L, 1);
+    }
+
+    lua_pop(L, 2);
 }
 
 void Item::uninitializeItems(){
@@ -28,6 +50,9 @@ Inventory::Inventory(int size): size(size){
 }
 
 Inventory::~Inventory(){
+    for(int i = 0; i < size; i++){
+        if(items[i]) delete items[i];
+    }
     delete this->items;
 }
 
