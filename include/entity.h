@@ -31,7 +31,6 @@ public:
         int scale;
     };
 
-    static unsigned int currentEntityID;
 
     uid globalid;
     uid parentid;
@@ -65,6 +64,7 @@ public:
     void setAbility(int abi);
 
     int getMovespeed();
+    angle getFacing();
 
     stattype getMaxHealth();
     stattype getMaxAbility();

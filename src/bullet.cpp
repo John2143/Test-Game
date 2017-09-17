@@ -1,146 +1,124 @@
 #include "bullet.h"
+#include <algorithm>
 
-bulletData *bulletDatas;
-pbull worldBullets = NULL;
+std::vector<Bullet *> worldBullets;
 
-int currentBulletID = 0;
-pbull createBullet(uid dataid, framerate appTime, Entity &owner, angle ang){
-    pbull e = new bullet;
-    struct bulletData bdat = bulletDatas[dataid];
+static uid globalID = 0;
+size_t numBullets;
+Bullet::bulletData *Bullet::bulletDatas;
 
-    e->globalid = currentBulletID++;
-    e->dataid = dataid;
-    e->ctime = appTime;
+Bullet::Bullet(uid pid, Entity &owner, angle ang): parentid(pid), globalid(globalID++), ang(ang){
+    this->createTime = appTime;
+    this->x = owner.x;
+    this->y = owner.y;
 
-    e->nocollideAmountMax = 4;
-    e->nocollide = (uid *) malloc(e->nocollideAmountMax * sizeof(uid));
-    if(!e->nocollide){
-        printf("Out of memory @ createBullet\n");
-        exit(1);
+    this->damage = bulletDatas[pid].damage;
+
+    this->addNoCollide(owner.globalid);
+
+    worldBullets.push_back(this);
+}
+
+Bullet::~Bullet(){
+    for(size_t i = 0; i < worldBullets.size(); i++){
+        if(worldBullets[i] == this){
+            worldBullets[i] = worldBullets[worldBullets.size() - 1];
+        }
     }
-    e->nocollideAmount = 0;
-    addNoCollideEntToBullet(owner.globalid, e);
-
-    e->x = owner.x;
-    e->y = owner.y;
-    e->ang = ang;
-
-    e->damage = bdat.damage;
-
-    e->last = NULL;
-    e->next = worldBullets;
-    if(worldBullets) worldBullets->last = e;
-    worldBullets = e;
-
-    return e;
+    worldBullets.pop_back();
 }
 
-pbull createItemBullet(uid dataid, framerate appTime, Entity &owner, Item *it, angle ang){
-    pbull e = createBullet(dataid, appTime, owner, ang);
-    e->damage += it->getDamage();
-    return e;
+void Bullet::initializeBullets(){
+    lua_getfield(L, -1, "data");
+    lua_getfield(L, -1, "bullets");
+    lua_len(L, -1);
+
+    numBullets = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    Bullet::bulletDatas = new Bullet::bulletData[numBullets];
+
+    printf("Made %i bullets\n", numBullets);
+
+    for(size_t i = 0; i < numBullets; i++){
+        lua_geti(L, -1, i + 1);
+        if(!lua_istable(L, -1)) throw "Incorrect table format in bullet data "_s;
+
+#define defineField(name, logic) \
+        lua_getfield(L, -1, #name); \
+        bulletDatas[i].name = logic; \
+        lua_pop(L, 1);
+
+        defineField(texture, (textureID) lua_tonumber(L, -1));
+        defineField(speed, lua_tonumber(L, -1));
+        defineField(w, lua_tonumber(L, -1));
+        defineField(h, lua_tonumber(L, -1));
+        defineField(lifetime, lua_tonumber(L, -1));
+        defineField(damage, lua_tonumber(L, -1));
+        defineField(flags, 1);
+
+        lua_pop(L, 1);
+    }
+
+    lua_pop(L, 2);
 }
 
-void removeBullet(pbull e){
-    if(e->last) e->last->next = e->next;
-    if(e->next) e->next->last = e->last;
-    if(worldBullets == e) worldBullets = e->next;
-    free(e->nocollide);
-    delete e;
+void Bullet::uninitializeBullets(){
+    //delete bullets?
 }
 
-void initializeBullets(){
-    bulletDatas = new bulletData[50];
-
-    bulletDatas[0] = (struct bulletData) {
-        .speed = 500,
-        .damage = 5,
-        .lifetime = 1.,
-        .texture = loadTexture(assetFolderPath "bullet2x.png"),
-        .w = 32, .h = 32,
-        .flags = BFLAG_PIERCE,
-    };
-
-    bulletDatas[1] = (struct bulletData) {
-        .speed = 32,
-        .damage = 50,
-        .lifetime = 1,
-        .texture = loadTexture(assetFolderPath "bullet.png"),
-        .w = 32, .h = 128,
-        .flags = BFLAG_MELEE,
-    };
-}
-
-bool bulletHitboxTouching(Entity &e, pbull b){
-    position dx = e.x - b->x, dy = e.y - b->y;
+bool Bullet::hitboxTouching(Entity &e){
+    position dx = e.x - this->x, dy = e.y - this->y;
     float dist = sqrt(dx * dx + dy * dy);
     //bullets have a circular hitbox of 16 px
     return dist < MIN(e.w, e.h) + 16;
 }
 
-void addNoCollideEntToBullet(uid id, pbull b){
-    b->nocollide[b->nocollideAmount++] = id;
-    if(b->nocollideAmount >= b->nocollideAmountMax){
-        b->nocollideAmountMax = b->nocollideAmountMax * 2;
-        b->nocollide = (uid *) realloc(b->nocollide, b->nocollideAmountMax * sizeof(uid));
-        if(!b->nocollide){
-            printf("Out of memory @ addCollideEntToBullet\n");
-            exit(1);
-        }
-    }
+void Bullet::addNoCollide(uid id){
+    this->nocollide.push_back(id);
 }
 
-bool shouldBulletAndEntCollide(Entity &e, pbull b){
-    for(int i = 0; i < b->nocollideAmount; i++){
-        if(e.globalid == b->nocollide[i]) return false;
+bool Bullet::shouldCollide(Entity &e){
+    for(size_t i = 0; i < this->nocollide.size(); i++){
+        if(this->nocollide[i] == e.globalid){
+            return false;
+        }
     }
     return true;
 }
 
-void tickBullets(){
-    bool dead;
-    for(pbull e = worldBullets, next; e != NULL; e = next){
-        dead = false;
-        struct bulletData pdata = bulletDatas[e->dataid];
-        //TODO O(n^2) = bad
-        for(Entity *ent : worldEntities){
-            if(!shouldBulletAndEntCollide(*ent, e)) continue;
-            if(bulletHitboxTouching(*ent, e)){
-                /*printf("Doing %i damage to ent %i (hp %i)\n", e->damage, ent->globalid, ent->hp);*/
-                ent->changeHealth(-e->damage);
-                if(pdata.flags & BFLAG_PIERCE){
-                    addNoCollideEntToBullet(ent->globalid, e);
-                }else{
-                    dead = true;
-                    goto BULLET_DEAD;
-                }
-            }
-        }
+void Bullet::tick(){
+    bulletData pdata = this->getBaseData();
 
-        if(appTime - e->ctime >= pdata.lifetime){
-            dead = true;
-            goto BULLET_DEAD;
-        }else{
-            if(pdata.flags & BFLAG_MELEE){
-                /*e->x  = cos(e->ang) * pdata.speed + e->owner->x;*/
-                /*e->y  = sin(e->ang) * pdata.speed + e->owner->y;*/
+    for(Entity *ent : worldEntities){
+        if(!this->shouldCollide(*ent)) continue;
+        if(this->hitboxTouching(*ent)){
+            ent->changeHealth(-this->damage);
+
+            if(pdata.flags & BFLAG_PIERCE){
+                this->addNoCollide(ent->globalid);
             }else{
-                e->x += cos(e->ang) * pdata.speed * frameTime;
-                e->y += sin(e->ang) * pdata.speed * frameTime;
+                delete this;
+                return;
             }
         }
+    }
 
-        BULLET_DEAD:;
-
-        next = e->next;
-        if(dead) removeBullet(e);
+    if(appTime - this->createTime < pdata.lifetime){
+        this->x += cos(this->ang) * pdata.speed * frameTime;
+        this->y += sin(this->ang) * pdata.speed * frameTime;
+    }else{
+        delete this;
+        return;
     }
 }
 
-void uninitializeBullets(){
-    for(pbull b = worldBullets; b != NULL;){
-        pbull next = b->next;
-        delete b;
-        b = next;
+Bullet::bulletData &Bullet::getBaseData(){
+    return bulletDatas[this->parentid];
+}
+
+void Bullet::tickAll(){
+    for(Bullet *b : worldBullets){
+        b->tick();
     }
 }

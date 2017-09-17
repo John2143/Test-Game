@@ -1,5 +1,5 @@
 CC=g++ -std=c++11
-CFLAGS=-Wall -Wextra -Werror
+CFLAGS=-Wall -Wextra -Werror -Wno-reorder
 ifeq ($(PROD), "true")
 	CFLAGS += -03
 else

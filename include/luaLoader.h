@@ -76,6 +76,7 @@ private:
 
         //Create the userdata pointer that lua will actually get and assign it
         T **ptr = (T **) lua_newuserdata(L, sizeof(T*));
+
         *ptr = obj;
         luaL_setmetatable(L, T::className);
 
@@ -98,7 +99,7 @@ protected:
 };
 
 template <class T> class LunaClass{
-protected:
+public:
     T *proxy;
 };
 

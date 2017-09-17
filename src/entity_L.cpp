@@ -10,6 +10,7 @@ public:
     static typename Luna<Entity_L>::RegType Register[];
 
     Entity_L(lua_State *L){
+        printf("made p %p\n", this);
         uid pid = lua_tonumber(L, -1);
         proxy = new Entity(pid);
     }
@@ -104,6 +105,10 @@ public:
         setControlledEntity(proxy);
         return 1;
     }
+    int getFacing(lua_State *L){
+        lua_pushnumber(L, proxy->facing);
+        return 1;
+    }
 };
 
 const char Entity_L::className[] = "Entity";
@@ -124,6 +129,7 @@ Luna<Entity_L>::RegType Entity_L::Register[] = {
     {"spawn", &Entity_L::spawn},
     {"unspawn", &Entity_L::unspawn},
     {"setControlled", &Entity_L::setControlled},
+    {"facing", &Entity_L::getFacing},
     {NULL, NULL}
 };
 

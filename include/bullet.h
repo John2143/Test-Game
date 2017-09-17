@@ -6,52 +6,50 @@
 #include "inventory.h"
 
 #include <cmath>
+#include <vector>
 
-enum bulletFlags{
-    BFLAG_PIERCE = 1 << 0,
-    BFLAG_MELEE = 1 << 1,
-};
+class Bullet{
+public:
+    enum bulletFlags{
+        BFLAG_PIERCE = 1 << 0,
+    };
 
-struct bulletData{
-    int speed;
-    int damage;
-    framerate lifetime;
-    textureID texture;
-    int w, h;
-    int flags;
-};
+    static struct bulletData{
+        int speed;
+        int damage;
+        framerate lifetime;
+        textureID texture;
+        int w, h;
+        uint_least8_t flags;
+    } *bulletDatas;
 
-typedef struct bullet{
+    static void initializeBullets();
+    static void uninitializeBullets();
+
     uid globalid;
-
-    uid *nocollide;
-    int nocollideAmount;
-    int nocollideAmountMax;
+    uid parentid;
+    std::vector<uid> nocollide;
 
     int damage;
 
     position x, y;
     angle ang;
-    framerate ctime;
-    uid dataid;
+    framerate createTime;
 
-    struct bullet *next;
-    struct bullet *last;
-} *pbull;
+    Bullet(uid pid, Entity &owner, angle ang);
+    ~Bullet();
 
-extern struct bulletData *bulletDatas;
-extern pbull worldBullets;
+    void tick();
+    static void tickAll();
 
-pbull createBullet    (uid dataid, framerate appTime, Entity &owner,           angle ang);
-pbull createItemBullet(uid dataid, framerate appTime, Entity &owner, Item *it, angle ang);
-void removeBullet(pbull e);
+    bool hitboxTouching(Entity &e);
+    bool shouldCollide(Entity &e);
+    void addNoCollide(uid id);
+    bool testCollide(Entity &e);
 
-void initializeBullets();
-void uninitializeBullets();
+    bulletData &getBaseData();
+};
 
-void tickBullets();
-bool bulletHitboxTouching(Entity &e, pbull b);
-void addNoCollideEntToBullet(uid id, pbull b);
-bool shouldBulletAndEntCollide(Entity &e, pbull b);
+extern std::vector<Bullet *> worldBullets;
 
 #endif

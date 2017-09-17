@@ -73,7 +73,7 @@ static void controlEntity(){
     if(mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT)){
         logicUseItem(1);
     }
-
+    controlledEntity->facing = getLocalAimPosition(*controlledEntity);
 }
 
 void logicUseItem(int slot){
@@ -151,7 +151,7 @@ static void tickEntity(Entity &c){
 
 void gameUpdate(){
     if(controlledEntity != NULL) controlEntity();
-    tickBullets();
+    Bullet::tickAll();
 
     for(Entity *c : worldEntities){
         tickEntity(*c);

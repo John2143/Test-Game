@@ -29,7 +29,6 @@ static unsigned long clockDivisor;
 #include "tile.h"
 #include "bullet.h"
 #include "inventory.h"
-#include "itemFunctions.h"
 
 framerate frameTime = 0, appTime = 0;
 
@@ -93,9 +92,8 @@ int main(int argc, char** argv) {
     Entity::loadData();
     loadTileTextures();
     initializeWorld();
-    initializeBullets();
+    Bullet::initializeBullets();
     Item::initializeItems();
-    initializeItemFunctions();
     Lua::callGameFunc("postInit", 0, 0);
 
     fflush(stdout);
@@ -133,8 +131,7 @@ CLEANUP:
 
     Lua::callGameFunc("preExit", 0, 0);
     Item::uninitializeItems();
-    uninitializeItemFunctions();
-    uninitializeBullets();
+    Bullet::uninitializeBullets();
     uninitializeWorld();
     unloadTileTextures();
     Entity::unloadData();

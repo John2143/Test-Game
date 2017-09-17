@@ -198,9 +198,9 @@ static void renderWorld2D(struct graphics *g){
         y > -w && y < g->height + h \
 
     renderedBullets = 0;
-    for(pbull b = worldBullets; b != NULL; b = b->next){
+    for(Bullet *b : worldBullets){
         int x = (int) b->x - cameraX, y = (int) b->y - cameraY;
-        struct bulletData par = bulletDatas[b->dataid];
+        Bullet::bulletData par = b->getBaseData();
         if(inRender(x, y, par.w, par.h)){
             renderSquareTextureRot(par.texture, x - par.w/2, y - par.h/2, par.w, par.h, b->ang);
             renderedBullets++;

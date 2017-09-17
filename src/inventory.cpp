@@ -1,6 +1,6 @@
 #include "inventory.h"
 
-int64_t globalID = 0;
+static int64_t globalID = 0;
 
 Item::itemData *Item::itemDatas;
 static size_t numItems;

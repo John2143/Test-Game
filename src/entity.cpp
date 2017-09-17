@@ -1,17 +1,15 @@
 #include "entity.h"
 #include <algorithm>
 
+static unsigned int globalID = 0;
 std::vector<Entity *> worldEntities;
 
 static size_t numEntities;
 static Entity::entityData *defaultEntites;
 
-unsigned int Entity::currentEntityID = 0;
-
-Entity::Entity(uid pid): parentid(pid) {
-    this->globalid = Entity::currentEntityID++;
-
+Entity::Entity(uid pid): parentid(pid), globalid(globalID++){
     if(numEntities < parentid) throw "No entity with ID"_s;
+    printf("made %p\n", this);
 
     this->tid = defaultEntites[parentid].tid;
     this->stats = defaultEntites[parentid].stats;
@@ -53,7 +51,8 @@ void Entity::useItem(int slot){
     if(iuf == LUA_REFNIL) return;
 
     lua_rawgeti(L, LUA_REGISTRYINDEX, iuf);
-    lua_pcall(L, 0, 1, 0);
+    lua_pushvalue(L, 1);
+    lua_pcall(L, 1, 1, 0);
     if(!lua_toboolean(L, -1)){
         it->lastUse = appTime;
         this->abi -= idat.abiCost;

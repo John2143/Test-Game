@@ -21,6 +21,7 @@ function this:preInit()
     self.data = {
         entity = require "entityData",
         items = require "itemData",
+        bullets = require "bulletData",
     }
 end
 
