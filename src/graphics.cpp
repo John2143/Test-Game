@@ -169,29 +169,34 @@ void renderSquareTexture(textureID textureid, int x, int y, int w, int h){
     glEnd();
 }
 
-static int renderedEnts = 0, renderedBullets = 0;
-static void renderWorld2D(struct graphics *g){
+static void renderMap(graphics *g){
+    if(!World::currentWorld) return;
+    World &world = *World::currentWorld;
 
-    int startx, starty, endx, endy;
-    startx = (cameraX / TILEPIXELS);
-    endx   = ((cameraX + g->width) / TILEPIXELS) + 1;
-    startx = MAX(startx, 0);
-    endx   = MIN(endx, WORLDSIZE);
+    size_t startx, starty, endx, endy;
+    if(cameraX < 0) startx = 0;
+    else startx = MAX(cameraX / TILEPIXELS, 0);
+    endx = MIN(((cameraX + g->width) / TILEPIXELS) + 1, world.size);
 
-    starty = (cameraY / TILEPIXELS);
-    endy   = ((cameraY + g->height) / TILEPIXELS) + 1;
-    starty = MAX(starty, 0);
-    endy   = MIN(endy, WORLDSIZE);
-    for(int x = startx; x < endx; x++){
-        for(int y = starty; y < endy; y++){
+    if(cameraY < 0) starty = 0;
+    else starty = MIN((cameraY / TILEPIXELS), 0);
+    endy = MIN(((cameraY + g->height) / TILEPIXELS) + 1, world.size);
+
+    for(size_t x = startx; x < endx; x++){
+        for(size_t y = starty; y < endy; y++){
             renderSquareTexture(
-                tileDatas[gameworld[x][y]].texture,
+                world.getd(x, y).texture,
                 x * TILEPIXELS - cameraX,
                 y * TILEPIXELS - cameraY,
                 TILEPIXELS, TILEPIXELS
             );
         }
     }
+}
+
+static int renderedEnts = 0, renderedBullets = 0;
+static void renderWorld2D(struct graphics *g){
+    renderMap(g);
 
 #define inRender(x, y, w, h) \
         x > -w && x < g->width  + h && \

@@ -3,13 +3,24 @@
 
 #include "global.h"
 #include "tile.h"
-#include <cstring>
 
-#define WORLDSIZE 2
+class World{
+public:
+    static World *currentWorld;
 
-extern tileid gameworld[WORLDSIZE][WORLDSIZE];
+    size_t size;
+    tileid *gameworld;
 
-void initializeWorld();
-void uninitializeWorld();
+    World(size_t size);
+    ~World();
+
+    tileid get(size_t x, size_t y);
+    tile &getd(size_t x, size_t y);
+    void set(size_t x, size_t y, tileid id);
+    void makeCurrent();
+
+    static void initializeWorld();
+    static void uninitializeWorld();
+};
 
 #endif

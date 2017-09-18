@@ -33,12 +33,13 @@ function this:postInit()
         :setPos(700, 500)
 
     self.enemies = {}
-    for i = 1, 10 do
+    for i = 1, 10000 do
         self.enemies[i] = Entity(1)
             :grantAI(1) --AI_WANDER
             :setPos(300, 500)
             :spawn()
     end
+    self.map = require "map"
 end
 
 --Gameloop just finished, save data and deconstruct things

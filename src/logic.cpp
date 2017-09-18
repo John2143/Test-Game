@@ -81,26 +81,30 @@ void logicUseItem(int slot){
 }
 
 void tickWallCheck(Entity &e){
-    int x = e.x;
-    int y = e.y;
-    int w2 = e.w/2;
-    int h2 = e.h/2;
-    int tileX = x/TILESIZE;
-    int tileY = y/TILESIZE;
+    if(!World::currentWorld) return;
+    World &world = *World::currentWorld;
+    if(e.x > world.size || e.y > world.size || e.x < 0 || e.y < 0) return;
+
+    size_t x = e.x;
+    size_t y = e.y;
+    size_t w2 = e.w/2;
+    size_t h2 = e.h/2;
+    size_t tileX = x/TILESIZE;
+    size_t tileY = y/TILESIZE;
     if(tileX < 1 || tileY < 1 ||
-       tileY >= WORLDSIZE - 1 || tileX >= WORLDSIZE - 1)
+       tileY >= world.size - 1 || tileX >= world.size - 1)
         return;
-    if(tileDatas[gameworld[tileX - 1][tileY]].isSolid){
+    if(tileDatas[world.get(tileX - 1, tileY)].isSolid){
         if(x - tileX*TILESIZE < w2) e.x = w2 + tileX*TILESIZE;
     }
-    if(tileDatas[gameworld[tileX + 1][tileY]].isSolid){
+    if(tileDatas[world.get(tileX + 1, tileY)].isSolid){
         //HACKY: TILESIZE = PLAYER SIZE:::: CHANGE IN RELEASE
         if(x - tileX*TILESIZE > w2) e.x = w2 + tileX*TILESIZE;
     }
-    if(tileDatas[gameworld[tileX][tileY - 1]].isSolid){
+    if(tileDatas[world.get(tileX, tileY - 1)].isSolid){
         if(y - tileY*TILESIZE < h2) e.y = h2 + tileY*TILESIZE;
     }
-    if(tileDatas[gameworld[tileX][tileY + 1]].isSolid){
+    if(tileDatas[world.get(tileX, tileY + 1)].isSolid){
         //HACKY: TILESIZE = PLAYER SIZE:::: CHANGE IN RELEASE
         if(y - tileY*TILESIZE > h2) e.y = h2 + tileY*TILESIZE;
     }

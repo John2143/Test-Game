@@ -1,6 +1,7 @@
 #include "glua.h"
 #include "entity_L.cpp"
 #include "bullet_L.cpp"
+#include "map_L.cpp"
 
 lua_State *L;
 
@@ -77,6 +78,7 @@ int Lua::start(){
     //Define globals
     Luna<Entity_L>::Register(L);
     Luna<Bullet_L>::Register(L);
+    Luna<Map_L>::Register(L);
 
     lua_pushcfunction(L, luaLoadTexture);
     lua_setglobal(L, "loadTexture");

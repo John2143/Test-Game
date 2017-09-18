@@ -22,7 +22,7 @@ end
 return {
     {
         tid = loadTexture("player.png"),
-        stats = si{2000, 2, 3, 4},
+        stats = si{100, 10, 60, 40},
         name = "Player",
         scale = 4,
     }, {

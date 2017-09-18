@@ -10,7 +10,6 @@ public:
     static typename Luna<Entity_L>::RegType Register[];
 
     Entity_L(lua_State *L){
-        printf("made p %p\n", this);
         uid pid = lua_tonumber(L, -1);
         proxy = new Entity(pid);
     }

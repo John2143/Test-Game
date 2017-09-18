@@ -9,7 +9,6 @@ static Entity::entityData *defaultEntites;
 
 Entity::Entity(uid pid): parentid(pid), globalid(globalID++){
     if(numEntities < parentid) throw "No entity with ID"_s;
-    printf("made %p\n", this);
 
     this->tid = defaultEntites[parentid].tid;
     this->stats = defaultEntites[parentid].stats;

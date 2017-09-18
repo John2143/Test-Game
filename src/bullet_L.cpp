@@ -13,7 +13,7 @@ public:
     Bullet_L(lua_State *L){
         uid pid = lua_tonumber(L, -3);
         Entity_L *udata = *(Entity_L **) lua_touserdata(L, -2);
-        Entity *owner= udata->proxy;
+        Entity *owner = udata->proxy;
 
         angle ang = lua_tonumber(L, -1);
         proxy = new Bullet(pid, *owner, ang);
