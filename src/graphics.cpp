@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-static void logWindowDetails(const char * detail, SDL_DisplayMode *mode){
+static void logWindowDetails(const char *detail, SDL_DisplayMode *mode){
     printf("%s:\n  %ix%i @ %i\n  %i monitors\n",
         detail,
         mode->w, mode->h, mode->refresh_rate,
@@ -9,53 +9,63 @@ static void logWindowDetails(const char * detail, SDL_DisplayMode *mode){
 }
 
 static textureID areaTexture;
-struct font *globalFont, *globalMonoFont;
+Font *globalFont, *globalMonoFont;
+
 static GLint LODlevel = 0;
 
-void initiateGraphics(struct graphics *g, const char* name){
+Graphics::Graphics(const char *name, int width, int height): width(width), height(height){
     if(SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0){
         printf("SDL failed to start: %s", SDL_GetError());
         return;
     }
-    g->window = SDL_CreateWindow(
+    this->window = SDL_CreateWindow(
         name,
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, g->width, g->height,
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
         SDL_WINDOW_OPENGL
     );
-    setCameraOffset(g->width/2, g->height/2);
+    setCameraOffset(width/2, height/2);
 
-    if(!g->window){
+    if(!this->window){
         printf("Failed to create error: %s\n", SDL_GetError());
         return;
     }
-    if(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)){
+
+    if(!IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG){
         printf("Failed to load SDL_image: %s\n", IMG_GetError());
         return;
     }
 
     SDL_DisplayMode mode;
-    SDL_GetWindowDisplayMode(g->window, &mode);
+    SDL_GetWindowDisplayMode(this->window, &mode);
     logWindowDetails("Default", &mode);
 
-    g->glcontext = SDL_GL_CreateContext(g->window);
-    g->windowHeight = mode.h;
-    g->windowWidth = mode.w;
+    this->glcontext = SDL_GL_CreateContext(this->window);
+    this->windowHeight = mode.h;
+    this->windowWidth = mode.w;
     glClearColor(0, 0, 0, 1);
-    setVSync(0);
+
+    SDL_GL_SetSwapInterval(1);
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    globalFont = loadFont(assetFolderPath "font", 8, 16);
-    globalMonoFont = loadFont(assetFolderPath "fontMono", 8, 16);
+    globalFont =     new Font(assetFolderPath "font", 8, 16);
+    globalMonoFont = new Font(assetFolderPath "fontMono", 8, 16);
     areaTexture = loadTexture(assetFolderPath "areaHuge.png");
 }
 
-struct font *loadFont(const char *name, int bits, int width){
+Graphics::~Graphics(){
+    IMG_Quit();
+
+    SDL_GL_DeleteContext(this->glcontext);
+    SDL_DestroyWindow(this->window);
+    SDL_Quit();
+}
+
+Font::Font(const char *name, int bits, int width){
     SDL_Surface *fullFont;
-    font *newFont = new font;
-    newFont->bits = bits;
+    this->bits = bits;
 
     {
         char buff[128];
@@ -64,17 +74,14 @@ struct font *loadFont(const char *name, int bits, int width){
         fullFont = IMG_Load(buff);
         if(fullFont == NULL){
             printf("Failed to load image: %s\n", IMG_GetError());
-            delete newFont;
-            return NULL;
+            throw "Couldnt make font"_s;
         }
         strcpy(buff, name);
         strcat(buff, ".kerning");
         FILE *fp = fopen(buff, "rb");
-        if(fp == NULL) goto FAILEDLOAD;
-        size_t readBytes = fread(newFont->kerning, 1, KERNINGSIZE, fp);
-        if(readBytes != KERNINGSIZE) goto FAILEDLOAD;
-        if(0){
-        }
+        if(fp == NULL) throw "Couldnt open kerning"_s;
+        size_t readBytes = fread(this->kerning, 1, KERNINGSIZE, fp);
+        if(readBytes != KERNINGSIZE) throw "Couldnt read kerning properly"_s;
         fclose(fp);
     }
 
@@ -84,26 +91,20 @@ struct font *loadFont(const char *name, int bits, int width){
     for(int i = 0, ty = 0; ; ty++){
         for(int tx = 0; tx < width; tx++){
             SDL_Rect srcrect = {.x = tx * bits, .y = ty * bits,
-                                .w = newFont->kerning[i], .h = bits};
+                                .w = this->kerning[i], .h = bits};
 
             SDL_Surface *fontLetter = SDL_CreateRGBSurface(0, srcrect.w, srcrect.h, 32, 0xff000000, 0xff0000, 0xff00, 0xff);
             //TODO better way to copy textures
             SDL_FillRect(fontLetter, NULL, SDL_MapRGB(fontLetter->format, 0, 0, 0));
             SDL_BlitSurface(fullFont, &srcrect, fontLetter, NULL);
 
-            newFont->chars[i] = loadTextureFromSurface(fontLetter);
+            this->chars[i] = Graphics::loadTextureFromSurface(fontLetter);
             if(++i >= 128) goto FINISH;
         }
     }
 
 FINISH:
     SDL_FreeSurface(fullFont);
-    return newFont;
-
-FAILEDLOAD:
-    printf("Failed to load kerning\n");
-    delete newFont;
-    return NULL;
 }
 
 textureID loadTexture(const char *name){
@@ -112,10 +113,10 @@ textureID loadTexture(const char *name){
         printf("Failed to load image: %s\n", IMG_GetError());
         return -1;
     }
-    return loadTextureFromSurface(texture);
+    return Graphics::loadTextureFromSurface(texture);
 }
 
-textureID loadTextureFromSurface(SDL_Surface *texture){
+textureID Graphics::loadTextureFromSurface(SDL_Surface *texture){
     GLuint id = 0;
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
@@ -131,21 +132,12 @@ textureID loadTextureFromSurface(SDL_Surface *texture){
     return (textureID) id; //Cast for warning protection
 }
 
-void destroyGraphics(struct graphics *g){
-    IMG_Quit();
-
-    SDL_GL_DeleteContext(g->glcontext);
-    SDL_DestroyWindow(g->window);
-    SDL_Quit();
-}
-
-void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang){
+void Graphics::renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang){
     glBindTexture(GL_TEXTURE_2D, textureid);
     ang = ang + PI/2;
 
 #define xm (x + w/2)
 #define ym (y + h/2)
-
 #define r(x, y) glVertex3i( \
     ((x - xm) * cos(ang) - (y - ym) * sin(ang)) + xm, \
     ((x - xm) * sin(ang) + (y - ym) * cos(ang)) + ym, \
@@ -159,7 +151,7 @@ void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, ang
     glEnd();
 }
 
-void renderSquareTexture(textureID textureid, int x, int y, int w, int h){
+void Graphics::renderSquareTexture(textureID textureid, int x, int y, int w, int h){
     glBindTexture(GL_TEXTURE_2D, textureid);
     glBegin(GL_QUADS);
         glTexCoord2i(0, 0); glVertex2i(x    , y    );
@@ -169,22 +161,22 @@ void renderSquareTexture(textureID textureid, int x, int y, int w, int h){
     glEnd();
 }
 
-static void renderMap(graphics *g){
+void Graphics::renderMap(){
     if(!World::currentWorld) return;
     World &world = *World::currentWorld;
 
     size_t startx, starty, endx, endy;
     if(cameraX < 0) startx = 0;
     else startx = MAX(cameraX / TILEPIXELS, 0);
-    endx = MIN(((cameraX + g->width) / TILEPIXELS) + 1, world.size);
+    endx = MIN(((cameraX + this->width) / TILEPIXELS) + 1, world.size);
 
     if(cameraY < 0) starty = 0;
     else starty = MIN((cameraY / TILEPIXELS), 0);
-    endy = MIN(((cameraY + g->height) / TILEPIXELS) + 1, world.size);
+    endy = MIN(((cameraY + this->height) / TILEPIXELS) + 1, world.size);
 
     for(size_t x = startx; x < endx; x++){
         for(size_t y = starty; y < endy; y++){
-            renderSquareTexture(
+            this->renderSquareTexture(
                 world.getd(x, y).texture,
                 x * TILEPIXELS - cameraX,
                 y * TILEPIXELS - cameraY,
@@ -195,19 +187,19 @@ static void renderMap(graphics *g){
 }
 
 static int renderedEnts = 0, renderedBullets = 0;
-static void renderWorld2D(struct graphics *g){
-    renderMap(g);
+void Graphics::renderWorld2D(){
+    this->renderMap();
 
 #define inRender(x, y, w, h) \
-        x > -w && x < g->width  + h && \
-        y > -w && y < g->height + h \
+        x > -w && x < this->width  + h && \
+        y > -w && y < this->height + h \
 
     renderedBullets = 0;
     for(Bullet *b : worldBullets){
         int x = (int) b->x - cameraX, y = (int) b->y - cameraY;
         Bullet::bulletData par = b->getBaseData();
         if(inRender(x, y, par.w, par.h)){
-            renderSquareTextureRot(par.texture, x - par.w/2, y - par.h/2, par.w, par.h, b->ang);
+            this->renderSquareTextureRot(par.texture, x - par.w/2, y - par.h/2, par.w, par.h, b->ang);
             renderedBullets++;
         }
     }
@@ -216,17 +208,17 @@ static void renderWorld2D(struct graphics *g){
     for(Entity *c : worldEntities){
         int x = (int) c->x - cameraX, y = (int) c->y - cameraY;
         if(inRender(x, y, c->w, c->h)){
-            renderSquareTexture(c->tid, x - c->w/2, y - c->h/2, c->w, c->h);
+            this->renderSquareTexture(c->tid, x - c->w/2, y - c->h/2, c->w, c->h);
             renderedEnts++;
         }
     }
 }
 
 //This should be a power of two less than 256
-#define NUMFRAMERATES 32
-static void renderStatusBar(struct graphics *g){
+#define NUMFRAMERATES 64
+void Graphics::renderStatusBar(){
     static framerate frameRates[NUMFRAMERATES];
-    static uint8_t curFramerate = 0;
+    static uint_least8_t curFramerate = 0;
     static bool hasInitializedFramerates = false;
     frameRates[curFramerate++ % NUMFRAMERATES] = frameTime;
     if(!hasInitializedFramerates && curFramerate > NUMFRAMERATES) hasInitializedFramerates = true;
@@ -247,23 +239,23 @@ static void renderStatusBar(struct graphics *g){
     int y = 0;
     framerate fps = MIN(1/frameTime, 1000);
     sprintf(buf, "%.2fs %.4f nspf %.0f NFPS", appTime, normalizedFrametime, normalizedFPS);
-    renderTextJust(globalMonoFont, buf, g->width, 0, 4, JUSTIFY_RIGHT);
+    this->renderTextJust(globalMonoFont, buf, this->width, 0, 4, JUSTIFY_RIGHT);
     sprintf(buf, "%.4f spf %.0f FPS", frameTime, fps);
-    renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
+    this->renderTextJust(globalMonoFont, buf, this->width, y+=32, 4, JUSTIFY_RIGHT);
     if(cameraFollowing){
         sprintf(buf, "%.1f, %.1f pxy", cameraFollowing->x, cameraFollowing->y);
-        renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
+        this->renderTextJust(globalMonoFont, buf, this->width, y+=32, 4, JUSTIFY_RIGHT);
     }
     int rmx, rmy;
     worldMousePosition(rmx, rmy);
     sprintf(buf, "%i %i, %i mxy %i, %i rmxy", mouseState, mouseX, mouseY, rmx, rmy);
-    renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
+    this->renderTextJust(globalMonoFont, buf, this->width, y+=32, 4, JUSTIFY_RIGHT);
 
     sprintf(buf, "E: %i B: %i T: %i", renderedEnts, renderedBullets, renderedBullets + renderedEnts);
-    renderTextJust(globalMonoFont, buf, g->width, y+=32, 4, JUSTIFY_RIGHT);
+    this->renderTextJust(globalMonoFont, buf, this->width, y+=32, 4, JUSTIFY_RIGHT);
 
 #ifdef DEBUGFONT
-#define TEST(a) renderTextJust(globalFont, a, g->width, y+=32, 4, JUSTIFY_RIGHT)
+#define TEST(a) this->renderTextJust(globalFont, a, g->width, y+=32, 4, JUSTIFY_RIGHT)
     TEST("cwm fjordbank glyphs vext quiz");
     TEST("CWM FJORDBANK GLYPHS VEXT QUIZ");
     TEST("Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
@@ -275,7 +267,7 @@ static void renderStatusBar(struct graphics *g){
 }
 
 //Draws a square box with some texture
-#define glRectiWH(x, y, w, h) renderSquareTexture(areaTexture, x, y, w, h)
+#define glRectiWH(x, y, w, h) this->renderSquareTexture(areaTexture, x, y, w, h)
 /*#define glRectiWH(x, y, w, h) glRecti(x, y, (x) + (w), (y) + (h))*/
 
 #define xl (infoBoxX + bu)
@@ -292,8 +284,7 @@ static void renderStatusBar(struct graphics *g){
 
 #define BUFFERI(var) sprintf(tbuf, "%i", (int) (var));
 
-static void renderInterface(struct graphics *g){
-    (void) g;
+void Graphics::renderInterface(){
     Entity *lp;
     if((lp = cameraFollowing)){
 
@@ -322,9 +313,9 @@ static void renderInterface(struct graphics *g){
         glRectiWH(infoBoxX + bu, y, (int)((infoBoxWidth - dbu) * pct), 16 + dtbu); \
         glColor3f(1., 1., 1.); \
         BUFFERI(amt); \
-        renderTextJust(globalFont, tbuf, xl + tbu, y + tbu, 2, JUSTIFY_LEFT); \
+        this->renderTextJust(globalFont, tbuf, xl + tbu, y + tbu, 2, JUSTIFY_LEFT); \
         sprintf(tbuf, "%.0f%%", pct * 100); \
-        renderTextJust(globalFont, tbuf, xr - tbu, y + tbu, 2, JUSTIFY_RIGHT); \
+        this->renderTextJust(globalFont, tbuf, xr - tbu, y + tbu, 2, JUSTIFY_RIGHT); \
         ENDPANEL(); \
         }
 
@@ -340,16 +331,16 @@ static void renderInterface(struct graphics *g){
 #define STDISPL(name, variable, r, g, b) \
         BUFFERI(variable); \
         WHITECOLOR; \
-        xoffset = renderTextJust(globalFont, name " ", xl + tbu, y + tbu, 2, JUSTIFY_LEFT); \
+        xoffset = this->renderTextJust(globalFont, name " ", xl + tbu, y + tbu, 2, JUSTIFY_LEFT); \
         glColor3f(r, g, b); \
-        renderTextJust(globalFont, tbuf, xl + tbu + xoffset, y + tbu, 2, JUSTIFY_LEFT);
+        this->renderTextJust(globalFont, tbuf, xl + tbu + xoffset, y + tbu, 2, JUSTIFY_LEFT);
 
 #define STDISPR(name, variable, r, g, b) \
         BUFFERI(variable); \
         WHITECOLOR; \
-        xoffset = renderTextJust(globalFont, " " name, xr - tbu, y + tbu, 2, JUSTIFY_RIGHT); \
+        xoffset = this->renderTextJust(globalFont, " " name, xr - tbu, y + tbu, 2, JUSTIFY_RIGHT); \
         glColor3f(r, g, b); \
-        renderTextJust(globalFont, tbuf, xr - tbu - xoffset, y + tbu, 2, JUSTIFY_RIGHT);
+        this->renderTextJust(globalFont, tbuf, xr - tbu - xoffset, y + tbu, 2, JUSTIFY_RIGHT);
 
         int statsText = (16 + tbu);
         int xoffset = 0;
@@ -391,7 +382,7 @@ static void renderInterface(struct graphics *g){
                 WHITECOLOR;
                 if(it){
                     Item::itemData itd = it->getBaseData();
-                    renderSquareTexture(itd.texture, infoBoxX + xoffset + sidebuff, y + sidebuff, itemsize, itemsize);
+                    this->renderSquareTexture(itd.texture, infoBoxX + xoffset + sidebuff, y + sidebuff, itemsize, itemsize);
                 }else{
                     const char *const STEXT[] = {
                         "M1", "M2", "SP",
@@ -399,7 +390,7 @@ static void renderInterface(struct graphics *g){
                         "S1", "S2", "S3", "S4", "S5",
                     };
                     if(i < STRUCTARRAYLEN(STEXT)){
-                        renderTextJust(globalFont, STEXT[i],
+                        this->renderTextJust(globalFont, STEXT[i],
                             infoBoxX + xoffset + sidebuff + itemsize/2,
                             y + sidebuff + 4, 3, JUSTIFY_CENTER);
                     }
@@ -414,34 +405,34 @@ static void renderInterface(struct graphics *g){
     }
 }
 
-void renderGraphics(struct graphics *g){
+void Graphics::render(){
     glClear(GL_COLOR_BUFFER_BIT);
 
     glPushMatrix();
-        glOrtho(0., g->width, g->height, 0., 0., 1.);
+        glOrtho(0., this->width, this->height, 0., 0., 1.);
         glColor3f(1.0f, 1.0f, 1.0f);
-        renderWorld2D(g);
-        renderInterface(g);
-        renderStatusBar(g);
+        this->renderWorld2D();
+        this->renderInterface();
+        this->renderStatusBar();
     glPopMatrix();
 
-    SDL_GL_SwapWindow(g->window);
+    SDL_GL_SwapWindow(this->window);
 }
 
-int renderChar(const struct font *f, const unsigned char c, int x, int y, int scale){
+int Graphics::renderChar(Font *f, const unsigned char c, int x, int y, int scale){
     int ret = scale * f->kerning[c];
-    renderSquareTexture(f->chars[c], x, y, ret, scale * f->bits);
+    this->renderSquareTexture(f->chars[c], x, y, ret, scale * f->bits);
     return ret;
 }
 
-int renderText(const struct font *f, const char *text, int x, int y, int scale){
+int Graphics::renderText(Font *f, const char *text, int x, int y, int scale){
     const char *c = text;
     int len = 0;
-    while(*c) len += renderChar(f, *c++, x + len, y, scale) + scale;
+    while(*c) len += this->renderChar(f, *c++, x + len, y, scale) + scale;
     return len - scale;
 }
 
-int renderTextJust(const struct font *f, const char *text, int x, int y, int scale, enum justification just){
+int Graphics::renderTextJust(Font *f, const char *text, int x, int y, int scale, enum justification just){
     int len = textLength(f, text, scale);
     switch(just){
         case JUSTIFY_RIGHT:
@@ -454,13 +445,9 @@ int renderTextJust(const struct font *f, const char *text, int x, int y, int sca
     }
 }
 
-int textLength(const struct font *f, const char *text, int scale){
+int Graphics::textLength(Font *f, const char *text, int scale){
     const char *c = text;
     int len = 0;
     while(*c) len += scale * (f->kerning[(unsigned char) *c++] + 1);
     return len - scale;
-}
-
-void setVSync(bool vsync){
-    SDL_GL_SetSwapInterval(!!vsync);
 }

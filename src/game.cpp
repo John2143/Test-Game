@@ -68,23 +68,16 @@ int main(int argc, char** argv) {
 #endif
     printf("Starting\nClock divisor: %lu\n", clockDivisor);
 
-    graphics g;
-    g.height = 900;
-    g.width = 1200;
-
-    /*thread t;*/
-    /*newThread(test, NULL, &t);*/
-
     if(Lua::start()){
         printf("Lua could not initialize so quitting now\n");
         goto LUA_FAIL;
     }
 
-    initiateGraphics(&g, "Test window");
-    if(!g.window) goto CLEANUP;
+    Graphics *g;
+    g = new Graphics("Test Window", 1200, 900);
+    if(!g->window) goto WINDOW_FAIL;
 
     Lua::callGameFunc("preInit", 0, 0);
-
     initLogic();
     Entity::loadData();
     loadTileTextures();
@@ -101,7 +94,7 @@ int main(int argc, char** argv) {
 
     while(1){
         cameraTick();
-        renderGraphics(&g);
+        g->render();
 
         oldMouseState = mouseState;
         mouseState = SDL_GetMouseState(&mouseX, &mouseY);
@@ -126,17 +119,18 @@ int main(int argc, char** argv) {
         frameStart = frameEnd;
         gameUpdate();
     }
-CLEANUP:
 
+CLEANUP:
     Lua::callGameFunc("preExit", 0, 0);
     Item::uninitializeItems();
     Bullet::uninitializeBullets();
     World::uninitializeWorld();
     unloadTileTextures();
     Entity::unloadData();
-    destroyGraphics(&g);
     Lua::callGameFunc("postExit", 0, 0);
 
+WINDOW_FAIL:
+    delete g;
 LUA_FAIL:
     Lua::end();
 

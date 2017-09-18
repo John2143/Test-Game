@@ -15,39 +15,46 @@
 #define KERNINGSIZE 128
 
 typedef GLuint fontID;
-struct font{
+class Font{
+public:
     fontID chars[128];
     unsigned char kerning[128];
     int bits;
+
+    Font(const char *name, int bits, int width);
+    ~Font();
 };
 
-extern struct font *globalFont;
-struct font *loadFont(const char *name, int bits, int width);
+class Graphics{
+public:
+    enum justification{
+        JUSTIFY_LEFT, JUSTIFY_RIGHT, JUSTIFY_CENTER
+    };
 
-struct graphics{
     SDL_Window *window;
     SDL_GLContext glcontext;
     int width, height;
     int windowWidth, windowHeight;
+
+    Graphics(const char *name, int weight, int height);
+    ~Graphics();
+
+    void render();
+
+    void renderSquareTexture   (textureID textureid, int x, int y, int w, int h);
+    void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang);
+
+    static textureID loadTextureFromSurface(SDL_Surface *texture);
+
+    int renderChar    (Font *f, const unsigned char c, int x, int y, int scale);
+    int renderText    (Font *f, const char *text,      int x, int y, int scale);
+    int renderTextJust(Font *f, const char *text,      int x, int y, int scale, justification just);
+    int textLength    (Font *f, const char *text,                    int scale);
+
+    void renderMap();
+    void renderWorld2D();
+    void renderStatusBar();
+    void renderInterface();
 };
-
-void initiateGraphics(struct graphics *g, const char* name);
-void destroyGraphics(struct graphics *g);
-void renderGraphics(struct graphics *g);
-void setVSync(bool vsync);
-
-void renderSquareTexture   (textureID textureid, int x, int y, int w, int h);
-void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang);
-
-textureID loadTextureFromSurface(SDL_Surface *texture);
-
-enum justification{
-    JUSTIFY_LEFT, JUSTIFY_RIGHT, JUSTIFY_CENTER
-};
-
-int renderChar    (const struct font *f, const unsigned char c, int x, int y, int scale);
-int renderText    (const struct font *f, const char *text,      int x, int y, int scale);
-int renderTextJust(const struct font *f, const char *text,      int x, int y, int scale, enum justification just);
-int textLength    (const struct font *f, const char *text,                    int scale);
 
 #endif

@@ -42,6 +42,9 @@ function this:postInit()
     self.map = require "map"
 end
 
+function this:postRender()
+end
+
 --Gameloop just finished, save data and deconstruct things
 function this:preExit()
     self.player:unspawn()
