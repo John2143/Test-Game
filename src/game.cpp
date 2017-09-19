@@ -73,10 +73,6 @@ int main(int argc, char** argv) {
         goto LUA_FAIL;
     }
 
-    Graphics *g;
-    g = new Graphics("Test Window", 1200, 900);
-    if(!g->window) goto WINDOW_FAIL;
-
     Lua::callGameFunc("preInit", 0, 0);
     initLogic();
     Entity::loadData();
@@ -94,7 +90,9 @@ int main(int argc, char** argv) {
 
     while(1){
         cameraTick();
-        g->render();
+        lua_pushnumber(L, appTime);
+        lua_pushnumber(L, frameTime);
+        Lua::callGameFunc("render", 2, 0);
 
         oldMouseState = mouseState;
         mouseState = SDL_GetMouseState(&mouseX, &mouseY);
@@ -129,8 +127,6 @@ CLEANUP:
     Entity::unloadData();
     Lua::callGameFunc("postExit", 0, 0);
 
-WINDOW_FAIL:
-    delete g;
 LUA_FAIL:
     Lua::end();
 

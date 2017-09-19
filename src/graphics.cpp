@@ -12,7 +12,7 @@ static textureID areaTexture;
 Font *globalFont, *globalMonoFont;
 
 static GLint LODlevel = 0;
-
+Graphics *currentGraphics;
 Graphics::Graphics(const char *name, int width, int height): width(width), height(height){
     if(SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0){
         printf("SDL failed to start: %s", SDL_GetError());
@@ -53,6 +53,9 @@ Graphics::Graphics(const char *name, int width, int height): width(width), heigh
     globalFont =     new Font(assetFolderPath "font", 8, 16);
     globalMonoFont = new Font(assetFolderPath "fontMono", 8, 16);
     areaTexture = loadTexture(assetFolderPath "areaHuge.png");
+
+    //TODO maybe return this to lua, or pass it to the function somehow?
+    currentGraphics = this;
 }
 
 Graphics::~Graphics(){
@@ -405,15 +408,17 @@ void Graphics::renderInterface(){
     }
 }
 
-void Graphics::render(){
+void Graphics::renderStart(){
     glClear(GL_COLOR_BUFFER_BIT);
 
     glPushMatrix();
-        glOrtho(0., this->width, this->height, 0., 0., 1.);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        this->renderWorld2D();
-        this->renderInterface();
-        this->renderStatusBar();
+
+    glOrtho(0., this->width, this->height, 0., 0., 1.);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    this->renderWorld2D();
+
+}
+void Graphics::renderEnd(){
     glPopMatrix();
 
     SDL_GL_SwapWindow(this->window);
@@ -432,7 +437,10 @@ int Graphics::renderText(Font *f, const char *text, int x, int y, int scale){
     return len - scale;
 }
 
-int Graphics::renderTextJust(Font *f, const char *text, int x, int y, int scale, enum justification just){
+int Graphics::renderTextJust(const char *text, int x, int y, int scale, justification just){
+    return this->renderTextJust(globalFont, text, x, y, scale, just);
+}
+int Graphics::renderTextJust(Font *f, const char *text, int x, int y, int scale, justification just){
     int len = textLength(f, text, scale);
     switch(just){
         case JUSTIFY_RIGHT:

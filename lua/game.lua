@@ -17,6 +17,7 @@ end
 --  including constructors (maps have not been memset, data has not been loaded
 --  from lua)
 function this:preInit()
+    self.graphics = Graphics("Test", 800, 600);
     self.generateMap = require "map"
     self.data = {
         entity = require "entityData",
@@ -42,7 +43,13 @@ function this:postInit()
     self.map = require "map"
 end
 
-function this:postRender()
+this.render = require "render"
+
+function this:render(t, dt)
+    local g = self.graphics
+    g:renderStart()
+    g:renderTextJust("test", 50, 50, 4, 0);
+    g:renderEnd()
 end
 
 --Gameloop just finished, save data and deconstruct things

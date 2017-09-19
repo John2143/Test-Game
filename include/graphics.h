@@ -10,6 +10,7 @@
 #include "input.h"
 #include "bullet.h"
 #include "inventory.h"
+#include "glua.h"
 
 #define TILEPIXELS TILESIZE
 #define KERNINGSIZE 128
@@ -28,7 +29,7 @@ public:
 class Graphics{
 public:
     enum justification{
-        JUSTIFY_LEFT, JUSTIFY_RIGHT, JUSTIFY_CENTER
+        JUSTIFY_LEFT = 0, JUSTIFY_RIGHT = 1, JUSTIFY_CENTER = 2
     };
 
     SDL_Window *window;
@@ -36,20 +37,27 @@ public:
     int width, height;
     int windowWidth, windowHeight;
 
-    Graphics(const char *name, int weight, int height);
+    Graphics(const char *name, int width, int height);
     ~Graphics();
 
-    void render();
-
-    void renderSquareTexture   (textureID textureid, int x, int y, int w, int h);
-    void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang);
+    void renderStart();
+    void renderEnd();
 
     static textureID loadTextureFromSurface(SDL_Surface *texture);
+
+    static void createLua();
+
+    int renderTextJust(const char *text,      int x, int y, int scale, justification just);
+
+private:
+    void renderSquareTexture   (textureID textureid, int x, int y, int w, int h);
+    void renderSquareTextureRot(textureID textureid, int x, int y, int w, int h, angle ang);
 
     int renderChar    (Font *f, const unsigned char c, int x, int y, int scale);
     int renderText    (Font *f, const char *text,      int x, int y, int scale);
     int renderTextJust(Font *f, const char *text,      int x, int y, int scale, justification just);
     int textLength    (Font *f, const char *text,                    int scale);
+
 
     void renderMap();
     void renderWorld2D();

@@ -2,12 +2,13 @@
 #include "entity_L.cpp"
 #include "bullet_L.cpp"
 #include "map_L.cpp"
+#include "graphics_L.cpp"
 
 lua_State *L;
 
 int Lua::callGameFunc(const char *name, int nargs, int nret){
     //Get the function from the game table
-    lua_getfield(L, -1, name);
+    lua_getfield(L, 1, name);
     if(!lua_isfunction(L, -1)){
         printf("%s is not defined, but was called\n", name);
         return 1;
@@ -79,6 +80,7 @@ int Lua::start(){
     Luna<Entity_L>::Register(L);
     Luna<Bullet_L>::Register(L);
     Luna<Map_L>::Register(L);
+    Luna<Graphics_L>::Register(L);
 
     lua_pushcfunction(L, luaLoadTexture);
     lua_setglobal(L, "loadTexture");
