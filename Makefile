@@ -9,10 +9,10 @@ COM=$(CC) $(CFLAGS)
 SOURCES := $(wildcard src/*.cpp)
 SOURCES := $(filter-out $(wildcard src/*_L.cpp), $(SOURCES))
 OBJ_FILES := $(patsubst %.cpp,%.o,$(SOURCES))
-I=-Iinclude
+I=-Iinclude -I/usr/include/lua5.3
 EXECUTABLE = game
 ifeq ($(shell uname),Linux)
-LIBRARIES=-L. -lSDL2main -lSDL2 -lSDL2_image -lm -L./luasrc/src -llua -ldl -lGL
+LIBRARIES=-L. -lSDL2main -lSDL2 -lSDL2_image -lm -llua -ldl -lGL
 else
 LIBRARIES=-L. -lSDL2main -lSDL2 -lOpengl32 -lglu32 -lSDL2_image -llua53
 I+=-Iluasrc/src

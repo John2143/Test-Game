@@ -1,5 +1,4 @@
 #include "bullet.h"
-#include <algorithm>
 
 std::vector<Bullet *> worldBullets;
 
@@ -38,7 +37,7 @@ void Bullet::initializeBullets(){
 
     Bullet::bulletDatas = new Bullet::bulletData[numBullets];
 
-    printf("Made %i bullets\n", numBullets);
+    printf("Made %zi bullets\n", numBullets);
 
     for(size_t i = 0; i < numBullets; i++){
         lua_geti(L, -1, i + 1);

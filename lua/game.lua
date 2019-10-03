@@ -18,11 +18,11 @@ end
 --  from lua)
 function this:preInit()
     self.graphics = Graphics("Test", 800, 600);
-    self.generateMap = require "map"
+    self.generateMap = require "lua/map"
     self.data = {
-        entity = require "entityData",
-        items = require "itemData",
-        bullets = require "bulletData",
+        entity = require "lua/entityData",
+        items = require "lua/itemdata",
+        bullets = require "lua/bulletData",
     }
 end
 
@@ -40,10 +40,10 @@ function this:postInit()
             :setPos(300, 500)
             :spawn()
     end
-    self.map = require "map"
+    self.map = require "lua/map"
 end
 
-this.render = require "render"
+this.render = require "lua/render"
 
 function this:render(t, dt)
     local g = self.graphics

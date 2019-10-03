@@ -14,7 +14,7 @@ void Item::initializeItems(){
 
     itemDatas = new Item::itemData[numItems];
 
-    printf("Made %i items\n", numItems);
+    printf("Made %zi items\n", numItems);
 
     for(size_t i = 0; i < numItems; i++){
         lua_geti(L, -1, i + 1);

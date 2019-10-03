@@ -1,6 +1,5 @@
 static unsigned long clockDivisor;
 
-#define WIN32 _WIN32
 #ifdef WIN32
 #    include <Windows.h>
 #    define thread DWORD

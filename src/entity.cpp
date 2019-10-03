@@ -76,7 +76,7 @@ void Entity::loadData(){
 
     defaultEntites = new Entity::entityData[numEntities];
 
-    printf("Made %i entities\n", numEntities);
+    printf("Made %zi entities\n", numEntities);
 
     for(size_t i = 0; i < numEntities; i++){
         lua_geti(L, -1, i + 1);

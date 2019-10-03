@@ -30,7 +30,7 @@ Graphics::Graphics(const char *name, int width, int height): width(width), heigh
         return;
     }
 
-    if(!IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG){
+    if(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)){
         printf("Failed to load SDL_image: %s\n", IMG_GetError());
         return;
     }

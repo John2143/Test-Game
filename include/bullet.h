@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <vector>
+#include <algorithm>
 
 class Bullet{
 public:
